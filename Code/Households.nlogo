@@ -1,24 +1,58 @@
-globals [pmd-production
-  organic-production
-  non-pmd-production
-  glass-production
-  paper-prodoction
-]
-
+globals[ general-bin ]
 breed [individuals individual]
 breed [families family]
 breed [couples couple]
 breed [retirees retired]
+breed [bins bin]
 
-turtles-own [
+
+bins-own [bin-size]
+
+individuals-own [
   bin-satisfaction
   recycle-perception
   education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
+  pmd ; in kg
+  organic ; in kg
+  non-pmd ; in kg
+  glass ; in kg
+  paper ; in kg
+]
+
+couples-own [
+  bin-satisfaction
+  recycle-perception
+  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
+  pmd ; in kg
+  organic ; in kg
+  non-pmd ; in kg
+  glass ; in kg
+  paper ; in kg
+]
+families-own [
+  bin-satisfaction
+  recycle-perception
+  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
+  pmd ; in kg
+  organic ; in kg
+  non-pmd ; in kg
+  glass ; in kg
+  paper ; in kg
+]
+retirees-own [
+  bin-satisfaction
+  recycle-perception
+  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
+  pmd ; in kg
+  organic ; in kg
+  non-pmd ; in kg
+  glass ; in kg
+  paper ; in kg
 ]
 
 to set-up
   clear-all
-
+  set general-bin 50
   create-individuals share-individuals
   [ set shape "person"
     set color green
@@ -44,18 +78,59 @@ to set-up
     setxy random-xcor random-ycor
     set education-level random 4
   ]
+  reset-ticks
+
+  create-bins bin-count
+  [ set shape "box"
+    set color red
+    setxy random-xcor random-ycor
+    set bin-size 1000
+  ]
 end
 
 to go
   ask individuals [
-    set pmd-production pmd-production + 1
-    set organic-production organic-production + 1
-    set non-pmd-production non-pmd-production + 1
-    set glass-production glass-production + 1
-    set paper-prodoction paper-prodoction + 1
+    set pmd pmd + 1
+    set organic organic + 1
+    set non-pmd non-pmd + 1
+    set glass glass + 1
+    set paper paper + 1
+  ]
+  ask families [
+    set pmd pmd + 1
+    set organic organic + 1
+    set non-pmd non-pmd + 1
+    set glass glass + 1
+    set paper paper + 1
+  ]
+  ask couples [
+    set pmd pmd + 1
+    set organic organic + 1
+    set non-pmd non-pmd + 1
+    set glass glass + 1
+    set paper paper + 1
+  ]
+  ask retirees [
+    set pmd pmd + 1
+    set organic organic + 1
+    set non-pmd non-pmd + 1
+    set glass glass + 1
+    set paper paper + 1
+    full-bin
   ]
   tick
 end
+
+to full-bin
+  if pmd + organic + non-pmd >= general-bin [ walk-to-bin ]
+end
+
+to walk-to-bin
+  move-to bin 105
+end
+
+
+
 
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -79,8 +154,8 @@ GRAPHICS-WINDOW
 16
 -16
 16
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -178,6 +253,21 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+18
+152
+190
+185
+bin-count
+bin-count
+0
+5
+5.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
