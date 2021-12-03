@@ -6,7 +6,7 @@ breed [retirees retired]
 breed [region-bins region-bin]
 
 
-region-bins-own [bin-size]
+region-bins-own [bin-size bin-level]
 
 individuals-own [
   bin-satisfaction
@@ -40,11 +40,12 @@ retirees-own [
   pmd ; in kg
   organic ; in kg
   non-pmd ; in kg
+  general-waste
 ]
 
 to set-up
   clear-all
-  set general-waste-bin 50 ; in kg
+  set general-waste-bin 15 ; in kg
   create-individuals share-individuals
   [ set shape "person"
     set color green
@@ -107,12 +108,14 @@ end
 
 to full-bin
   if pmd + organic + non-pmd >= general-waste-bin [ walk-to-bin ] ; if these waste types add up to the max waste the agent will go to the main bins
+     set general-waste general-waste = pmd + organic + non-pmd
+
 end
 
 to walk-to-bin
   move-to region-bin 105
-end
 
+end
 
 @#$#@#$#@
 GRAPHICS-WINDOW
