@@ -118,10 +118,8 @@ to produce-waste
   ;r=bla
   ;if agent= family
   ;r=bakancawj
+  ]
 
-
-end
-to change-perceptionlevel
 end
 
 
@@ -131,8 +129,8 @@ to seperate-waste
 end
 
 to full-bin
-  ;if pmd +  non-pmd >= general-waste-bin [ walk-to-bin ] ; if these waste types add up to the max waste the agent will go to the main bins
-     ;set general-waste general-waste = pmd + non-pmd
+  if pmd +  non-pmd >= general-waste-bin [ walk-to-bin ] ; if these waste types add up to the max waste the agent will go to the main bins
+     set general-waste general-waste = pmd + non-pmd
 end
 to change-satisfactionlevel
   ;
