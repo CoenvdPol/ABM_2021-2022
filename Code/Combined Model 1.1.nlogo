@@ -1,71 +1,41 @@
-globals[ general-waste-bin ]
+globals[ general-waste-bin]
 breed [individuals individual]
-breed [families family]
+breed [families familie]
 breed [couples couple]
-breed [retirees retired]
+breed [retirees retiree]
 breed [region-bins region-bin]
-breed [ wastecomps wastecomp ] ; number of waste companies can be also analyzed; Instead of waste-company, I can make it waste facility
-
+breed [ wastecomps wastecomp ]
+individuals-own [bin-satisfaction recycle-perception education-level pmd non-pmd]; we can exclude pmd and non-pmd
+families-own [bin-satisfaction recycle-perception education-level pmd non-pmd]; we can exclude pmd and non-pmd
+couples-own [bin-satisfaction recycle-perception education-level pmd non-pmd]; we can exclude pmd and non-pmd
+retirees-own [bin-satisfaction recycle-perception education-level pmd non-pmd]; we can exclude pmd and non-pmd
+wastecomps-own [capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
 region-bins-own [bin-size bin-level]
-wastecomps-own [ capacity energy money cost trucks];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent
-
-individuals-own [
-  bin-satisfaction
-  recycle-perception
-  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  pmd ; in kg
-  non-pmd ; in kg
-]
-
-couples-own [
-  bin-satisfaction ; satisfaction level of the pick up and emptying of the region bins
-  recycle-perception ; view on recycling the higher the more they will recycle
-  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  pmd ; in kg
-  non-pmd ; in kg
-]
-families-own [
-  bin-satisfaction
-  recycle-perception
-  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  pmd ; in kg
-  non-pmd ; in kg
-]
-retirees-own [
-  bin-satisfaction
-  recycle-perception
-  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  pmd ; in kg
-  non-pmd ; in kg
-  general-waste
-]
 
 to set-up
   clear-all
     ask patches [
     set pcolor blue
   ]
-
     create-region-bins bin-count
   [ set shape "garbage can"
     set color red
     set size 2
-    setxy random-xcor random-ycor
-    set bin-size 1000
+    setxy random-xcor random-ycor  ; we will adjust this section
+    set bin-size 1000              ; we can also make it decision variable
   ]
 
   create-wastecomps 1[
-    set color green
-    set size 3  ;; easier to see
+    set color green set shape "factory" set size 3  ;; easier to see
     setxy 1500 1500
-    set capacity 100
+    set capacity 10000 ;assume factory has enough capacity to recycle
     set energy 0 ; think it operates as steady state
     set money 0; think it is like a profit
     ;create-links-with region-bins --> If we want to show the relationship between wastecomps and bins
   ]
-  set-default-shape wastecomps "factory"
 
-  set general-waste-bin 15 ; in kg
+  set general-waste-bin 15 ; in kg, I missed that part
+
   create-individuals share-individuals
   [ set shape "person"
     set color green
@@ -95,8 +65,8 @@ to set-up
 end
 
 to go
-   if ticks >= 1000 [ stop ];
-  ask individuals [ ;this can be agentset and contains different agents. Then we can write if clause for different agents.
+   if ticks >= 1000 [ stop ]; we will also look at it
+  ask individuals[ ;this can be agentset and contains different agents. Then we can write if clause for different agents.
     produce-waste ;it is function
     change-perceptionlevel
     seperate-waste;
@@ -111,6 +81,7 @@ to go
   ]
   tick
 end
+ ;;education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
 
 to produce-waste
   ;create a function with r that represents different agentsets;

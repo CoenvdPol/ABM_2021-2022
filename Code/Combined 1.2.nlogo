@@ -1,102 +1,57 @@
-globals[ general-waste-bin ]
-breed [individuals individual]
-breed [families family]
-breed [couples couple]
-breed [retirees retired]
+globals[ general-waste-bin]
+breed [households household]
 breed [region-bins region-bin]
-breed [ wastecomps wastecomp ] ; number of waste companies can be also analyzed; Instead of waste-company, I can make it waste facility
-
+breed [ wastecomps wastecomp ]
+households-own [Id education-level recycle-perception bin-satisfaction pmd non-pmd] ; we can exclude pmd and non-pmd
+wastecomps-own [capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
 region-bins-own [bin-size bin-level]
-wastecomps-own [ capacity energy money cost trucks];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent
-
-individuals-own [
-  bin-satisfaction
-  recycle-perception
-  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  pmd ; in kg
-  non-pmd ; in kg
-]
-
-couples-own [
-  bin-satisfaction ; satisfaction level of the pick up and emptying of the region bins
-  recycle-perception ; view on recycling the higher the more they will recycle
-  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  pmd ; in kg
-  non-pmd ; in kg
-]
-families-own [
-  bin-satisfaction
-  recycle-perception
-  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  pmd ; in kg
-  non-pmd ; in kg
-]
-retirees-own [
-  bin-satisfaction
-  recycle-perception
-  education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  pmd ; in kg
-  non-pmd ; in kg
-  general-waste
-]
 
 to set-up
   clear-all
     ask patches [
     set pcolor blue
   ]
-
-    create-region-bins bin-count
+    create-region-bins 2
   [ set shape "garbage can"
     set color red
     set size 2
-    setxy random-xcor random-ycor
-    set bin-size 1000
+    setxy random-xcor random-ycor  ; we will adjust this section
+    set bin-size 1000              ; we can also make it decision variable
   ]
-
   create-wastecomps 1[
-    set color green
-    set size 3  ;; easier to see
+    set color green set shape "factory" set size 3  ;; easier to see
     setxy 1500 1500
-    set capacity 100
+    set capacity 10000 ;assume factory has enough capacity to recycle
     set energy 0 ; think it operates as steady state
     set money 0; think it is like a profit
     ;create-links-with region-bins --> If we want to show the relationship between wastecomps and bins
   ]
-  set-default-shape wastecomps "factory"
+  set general-waste-bin 15 ; in kg, I missed that part
 
-  set general-waste-bin 15 ; in kg
-  create-individuals share-individuals
-  [ set shape "person"
-    set color green
-    setxy random-xcor random-ycor
-    set education-level random 4
+  create-households random 60 [
+  set Id  random 4 ; how we make sure we have 4 different type of agents in agentset
+  set education-level random 4 ; assumption: educational level is based on the type of households
+  setxy random-xcor random-ycor
+  set shape "person"
+  if Id = 1 [; individual
+   set color green
   ]
-
-   create-families share-families
-  [ set shape "person"
+  if Id = 2 [ ; families
     set color brown
-    setxy random-xcor random-ycor
-    set education-level random 4
   ]
-  create-couples share-couples
-  [ set shape "person"
+   if Id = 3 [; couples
     set color pink
-    setxy random-xcor random-ycor
-    set education-level random 4
   ]
-  create-retirees share-retirees
-  [ set shape "person"
+   if Id = 4 [ ; retiress
     set color white
-    setxy random-xcor random-ycor
-    set education-level random 4
+    ]
   ]
   reset-ticks
 end
 
 to go
-   if ticks >= 1000 [ stop ];
-  ask individuals [ ;this can be agentset and contains different agents. Then we can write if clause for different agents.
+   if ticks >= 1000 [ stop ]; we will also look at it
+  ask households [
     produce-waste ;it is function
     change-perceptionlevel
     seperate-waste;
@@ -111,26 +66,33 @@ to go
   ]
   tick
 end
+ ;;education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
 
 to produce-waste
   ;create a function with r that represents different agentsets;
-  ;if agent=individual
-  ;r=bla
-  ;if agent= family
-  ;r=bakancawj
-  ]
+   ;if Id = 1 [ set r 10
+  ;]
+  ;if Id = 2 [ set r 5
+  ;]
+  ;if Id = 3 [ set r 4
+  ;]
+  ;if Id = 4 [ set r 3
+  ;]
+end
+to change-perceptionlevel
 
 end
 
 
 to seperate-waste
+
   ;create a new function based on the perception level
   ;if pmd
 end
 
 to full-bin
-  if pmd +  non-pmd >= general-waste-bin [ walk-to-bin ] ; if these waste types add up to the max waste the agent will go to the main bins
-     set general-waste general-waste = pmd + non-pmd
+  ;if pmd +  non-pmd >= general-waste-bin [ walk-to-bin ] ; if these waste types add up to the max waste the agent will go to the main bins
+     ;set general-waste general-waste = pmd + non-pmd
 end
 to change-satisfactionlevel
   ;
@@ -202,10 +164,10 @@ ticks
 30.0
 
 BUTTON
-12
-21
-85
+18
 54
+91
+87
 set-up
 set-up
 NIL
@@ -219,10 +181,10 @@ NIL
 1
 
 BUTTON
-102
-24
-165
-57
+118
+56
+181
+89
 go
 go
 T
@@ -234,81 +196,6 @@ NIL
 NIL
 NIL
 1
-
-SLIDER
-14
-86
-186
-119
-Share-individuals
-Share-individuals
-0
-100
-15.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-17
-144
-189
-177
-share-families
-share-families
-0
-100
-35.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-20
-202
-192
-235
-share-couples
-share-couples
-0
-100
-25.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-21
-258
-193
-291
-share-retirees
-share-retirees
-0
-100
-27.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-25
-315
-197
-348
-bin-count
-bin-count
-0
-5
-5.0
-1
-1
-NIL
-HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
