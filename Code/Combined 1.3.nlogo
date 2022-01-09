@@ -1,10 +1,12 @@
-globals[ general-waste-bin]
+globals[general-waste-bin]
 breed [households household]
 breed [region-bins region-bin]
-breed [ wastecomps wastecomp ]
+breed [wastecomps wastecomp ]
+breed [households-bins households-bin]
 households-own [id education-level recycle-perception bin-satisfaction separated non-separated waste r] ;
 wastecomps-own [capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
-region-bins-own [bin-size bin-level]
+region-bins-own [general-bin-size pmd-bin-size pmd-bin-level general-bin-level]
+households-bins-own [bin-size bin-level]
 
 to set-up
   clear-all
@@ -16,7 +18,8 @@ to set-up
     set color red
     set size 2
     setxy random-xcor random-ycor  ; we will adjust this section
-    set bin-size 1000              ; we can also make it decision variable
+    set general-bin-size 1000              ; we can also make it decision variable
+    set pmd-bin-size 500
   ]
   create-wastecomps 1[
     set color green set shape "factory" set size 3  ;; easier to see
@@ -58,6 +61,7 @@ to go
    if ticks >= 1000 [ stop ]; we will also look at it
   ask households [
     produce-waste ;it is function
+    collect-wastes-in-house;
     change-perceptionlevel
     full-bin ; the amounts that are generated from the production function is added into the
     change-satisfactionlevel;it can be binary
@@ -72,22 +76,37 @@ to go
 end
  ;;education-level ; 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
 
-to produce-waste  ;create a function with r that represents different agentsets [
+to produce-waste  ;create a function with r that represents different agentsets , if else will  be used [
   set waste waste + r *  ((490 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52
   set separated  waste * recycle-perception
   set non-separated  waste - separated
 end
 
-to change-perceptionlevel
-  recycle-perception
+to collect-wastes-in-house
+
 end
 
+
+to change-perceptionlevel
+  ;recycle-perception
+end
+
+
+; How turtles will choose the bins to put their waste (closest one) or assume the bins are assigned to households
 to full-bin
-  ;if pmd +  non-pmd >= general-waste-bin [ walk-to-bin ] ; if these waste types add up to the max waste the agent will go to the main bins
-     ;set general-waste general-waste = pmd + non-pmd
+ ask households [
+    if waste >= general-waste-bin [  ; if these waste types add up to the max waste the agent will go to the main bins [ walk-to-bin ]
+    set pmd-bin-level bin-level + separated ; assumption: bin has two blocks for pmd and general waste which have same level
+    set general-bin-level general-bin-level + non-separated
+    ]
+  ]
 end
 to change-satisfactionlevel
-  ;
+  ask households [
+  ifelse general-bin-size > general-bin-level
+    [set bin-satisfaction bin-satisfaction * 1.01] ; in every satisfied level, the satisfaction level increases %1.
+    [set bin-satisfaction bin-satisfaction * 0.99]  ; in every satisfied level, the satisfaction level decreases %1.
+  ]
 end
 
 ;to offer

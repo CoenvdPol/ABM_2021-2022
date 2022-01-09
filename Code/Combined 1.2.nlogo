@@ -5,6 +5,7 @@ breed [ wastecomps wastecomp ]
 households-own [Id education-level recycle-perception bin-satisfaction pmd non-pmd] ; we can exclude pmd and non-pmd
 wastecomps-own [capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
 region-bins-own [bin-size bin-level]
+;directed-link-breed [households household]
 
 to set-up
   clear-all
@@ -32,7 +33,8 @@ to set-up
   set Id  random 4 ; how we make sure we have 4 different type of agents in agentset
   set education-level random 4 ; assumption: educational level is based on the type of households
   setxy random-xcor random-ycor
-  set shape "person"
+  set shape "house"
+  set size 2
   if Id = 1 [; individual
    set color green
   ]
@@ -43,8 +45,8 @@ to set-up
     set color pink
   ]
    if Id = 4 [ ; retiress
-    set color white
-    ]
+    set color orange
+  ]
   ]
   reset-ticks
 end
