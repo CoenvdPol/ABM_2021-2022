@@ -1,22 +1,24 @@
+globals [ pmd-bin-size pmd-bin-level general-bin-size general-bin-level separated non-separated waste pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level]
 breed [households household]
 breed [bins bin]
 breed [wastecomps wastecomp ]
 breed [trashcans trashcan]
-households-own [id education-level recycle-perception bin-satisfaction separated non-separated waste r pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ;
+households-own [id education-level recycle-perception bin-satisfaction r]
+;households-own [id education-level recycle-perception bin-satisfaction separated non-separated waste r pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ;
 wastecomps-own [capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
-bins-own [pmd-bin-size pmd-bin-level general-bin-size general-bin-level separated non-separated] ; bins in the region
+;bins-own [pmd-bin-size pmd-bin-level general-bin-size general-bin-level] ; bins in the region
 ;trashcans-own [pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ; trashcan at households home
 
 to set-up
   clear-all
     ask patches [
-    set pcolor blue
+    set pcolor black
   ]
     create-bins 2
   [ set shape "garbage can"
     set color red
     set size 2
-    setxy random-xcor random-ycor  ; we will adjust this section
+    set ycor -750 + who * 1500
     set general-bin-size 1000              ; we can also make it decision variable
     set pmd-bin-size 500
   ]
@@ -34,8 +36,9 @@ to set-up
   set education-level random 5 ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 100
   set general-trashcan-size 100
-  setxy random-xcor random-ycor
-  set shape "person"
+  set xcor -1500 + who * 3
+  set shape "house"
+  set size 3
   ( ifelse
       id = 0 [
         set r 10
@@ -82,14 +85,14 @@ to produce-waste  ;create a function with r that represents different agentsets 
 end
 
 to manage-waste
- ask households[
-    (ifelse separated + pmd-trashcan-level <= pmd-trashcan-size
-      [set pmd-trashcan-level pmd-trashcan-level + separated ]
-      [ask bins [set pmd-bin-level pmd-bin-level + separated + pmd-trashcan-level]])
-   (ifelse non-separated + general-trashcan-level <= general-trashcan-size
-      [set general-trashcan-level general-trashcan-level + non-separated ]
-      [ask bins[set general-bin-level general-bin-level + [ask households [set non-separated + general-trashcan-level]]]])
-  ]
+    (ifelse pmd-trashcan-level + separated > pmd-trashcan-size
+       [set pmd-bin-level pmd-bin-level + pmd-trashcan-level
+        set pmd-bin-level 0 ]
+       [set pmd-trashcan-level pmd-trashcan-level + separated])
+    (ifelse non-separated + general-trashcan-level > general-trashcan-size
+       [set general-bin-level general-bin-level + general-trashcan-level
+        set general-trashcan-level 0 ]
+       [set general-trashcan-level general-trashcan-level + separated])
 end
 
 

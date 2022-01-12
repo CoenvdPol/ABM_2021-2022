@@ -4,7 +4,7 @@ breed [wastecomps wastecomp ]
 breed [trashcans trashcan]
 households-own [id education-level recycle-perception bin-satisfaction separated non-separated waste r pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ;
 wastecomps-own [capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
-bins-own [pmd-bin-size pmd-bin-level general-bin-size general-bin-level separated non-separated] ; bins in the region
+bins-own [pmd-bin-size pmd-bin-level general-bin-size general-bin-level] ; bins in the region
 ;trashcans-own [pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ; trashcan at households home
 
 to set-up
