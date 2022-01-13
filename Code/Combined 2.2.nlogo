@@ -82,17 +82,14 @@ end
 
 
 to produce-waste  ;create a function with r that represents different agentsets , if else will  be used [
-  ask households[
     set waste waste + r *  ((490 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52
     set separated  waste * recycle-perception
     set non-separated  waste - separated
     manage-waste
     set waste 0
-  ]
 end
 
 to manage-waste
-  ask households [
   (ifelse (non-separated + general-trashcan-level) >= general-trashcan-size
       [ dump-general-waste ]
       [ print "hallo"
@@ -101,11 +98,9 @@ to manage-waste
       [ dump-pmd-waste ]
       [ print "hallo wereld"
         set pmd-trashcan-level pmd-trashcan-level + separated ])
-  ]
 end
 
 to dump-general-waste
-  ask bin 0 [
     ifelse general-bin-level >= general-bin-size
     [ ask households
       [ set happy false
@@ -115,11 +110,9 @@ to dump-general-waste
       set happy true
       change-satisfactionlevel
       set general-trashcan-level 0 ] ]
-    ]
 end
 
 to dump-pmd-waste
-  ask bin 1 [
     ifelse pmd-bin-level  >= pmd-bin-size
     [ ask households
       [ set happy false
@@ -130,7 +123,6 @@ to dump-pmd-waste
       set happy true
       change-satisfactionlevel
       set pmd-trashcan-level 0] ]
-    ]
 end
 
 
@@ -263,24 +255,6 @@ NIL
 NIL
 NIL
 1
-
-PLOT
-792
-99
-992
-249
-general-trashcan-level
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"general-trash-level" 1.0 0 -7500403 true "" "plot general-trashcan-level"
 
 @#$#@#$#@
 ## WHAT IS IT?

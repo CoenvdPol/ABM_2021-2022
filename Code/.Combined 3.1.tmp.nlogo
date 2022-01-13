@@ -1,15 +1,10 @@
-globals [pmd-bin-size pmd-bin-level general-bin-size general-bin-level  ]
+globals [ pmd-bin-size pmd-bin-level general-bin-size general-bin-level pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level]
 breed [households household]
 breed [bins bin]
 breed [wastecomps wastecomp ]
 breed [trashcans trashcan]
-households-own [pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level separated non-separated waste id education-level recycle-perception bin-satisfaction r happy]
-;households-own [id education-level recycle-perception bin-satisfaction separated non-separated waste r pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ;
+households-own [id education-level recycle-perception bin-satisfaction separated non-separated waste r ] ;
 wastecomps-own [capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
-; bins-own [pmd-bin-size pmd-bin-level general-bin-size general-bin-level] ; bins in the region
-;trashcans-own [pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ; trashcan at households home
-
-directed-link-breed [streets street]
 
 to set-up
   clear-all
@@ -33,32 +28,30 @@ to set-up
     ;create-links-with region-bins --> If we want to show the relationship between wastecomps and bins
   ]
 
-  create-households   [
+  create-households 3[
   set id  random 4 ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5 ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 100
+  set recycle-perception 0.2 ; initial moment
   set general-trashcan-size 100
-  set recycle-perception 0.5
   set xcor -1500 + who * 3
   set shape "house"
-  ask households [ create-street-to bin 0 ]
-  ask households [ create-street-to bin 1 ]
   set size 3
   ( ifelse
       id = 0 [
-        set r 10
+        set r 1
         set color green
       ]
       id = 1 [
-        set r 5
+        set r 1.2
         set color brown
       ]
       id = 2 [
-        set r 4
+        set r 1.5
         set color pink
       ]
       id = 3 [
-        set r 3
+        set r 2
         set color white
       ])
   ]
@@ -69,77 +62,52 @@ to go
   if ticks >= 1000 [ stop ]; we will also look at it
   ask households [
     produce-waste ;it is function
+    manage-waste
     change-perceptionlevel
+    change-satisfactionlevel;it can be binary
   ]
   ask wastecomps [
-  collect-waste
+  collect-wastes
   recycle-plastics
   ;recover-residuals
   ;earn-money
   ]
   tick
+  ask households [set waste 0]
 end
 
 
 to produce-waste  ;create a function with r that represents different agentsets , if else will  be used [
-  ask households[
+
     set waste waste + r *  ((490 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52
     set separated  waste * recycle-perception
-    set non-separated  waste - separated
-    manage-waste
-    set waste 0
+    set pmd-trashcan-level (pmd-trashcan-level + separated)
+    set non-separated  (waste - separated)
+    set general-trashcan-level (general-trashcan-level + non-separated)
   ]
 end
 
 to manage-waste
   ask households [
-  (ifelse (non-separated + general-trashcan-level) >= general-trashcan-size
-      [ dump-general-waste ]
-      [ print "hallo"
-      set general-trashcan-level general-trashcan-level + non-separated ])
-  (ifelse (separated + pmd-trashcan-level) >= pmd-trashcan-size
-      [ dump-pmd-waste ]
-      [ print "hallo wereld"
-        set pmd-trashcan-level pmd-trashcan-level + separated ])
+    (ifelse pmd-trashcan-level >= pmd-trashcan-size
+       [set pmd-bin-level pmd-bin-level + pmd-trashcan-level
+        set pmd-trashcan-level 0
+      print "dump pmd"]
+       [set pmd-trashcan-level pmd-trashcan-level + separated
+      print "continue to collect pmd"])
+    (ifelse general-trashcan-level >= general-trashcan-size
+       [set general-bin-level general-bin-level + general-trashcan-level
+      print "dump general"
+        set general-trashcan-level 0 ]
+       [set general-trashcan-level general-trashcan-level + non-separated
+        print "continue to collect general"])
   ]
 end
-
-to dump-general-waste
-  ask bin 0 [
-    ifelse general-bin-level >= general-bin-size
-    [ ask households
-      [ set happy false
-      change-satisfactionlevel] ]
-    [ ask households
-      [ set general-bin-level general-bin-level + general-trashcan-level
-      set happy true
-      change-satisfactionlevel
-      set general-trashcan-level 0 ] ]
-    ]
-end
-
-to dump-pmd-waste
-  ask bin 1 [
-    ifelse pmd-bin-level  >= pmd-bin-size
-    [ ask households
-      [ set happy false
-        print "no-dump"
-      change-satisfactionlevel] ]
-    [ ask households
-      [ set pmd-bin-level pmd-bin-level + pmd-trashcan-level
-      set happy true
-      change-satisfactionlevel
-      set pmd-trashcan-level 0] ]
-    ]
-end
-
 
 to change-perceptionlevel
   ;recycle-perception
 end
 
-
-; How turtles will choose the bins to put their waste (closest one) or assume the bins are assigned to households
 
 
 to change-satisfactionlevel
@@ -150,11 +118,7 @@ to change-satisfactionlevel
   ]
 end
 
-
-to collect-waste ;;Either collection at home or central point collection --> This can be analysed
-  ask households [ ask bin 0 [
-   if general-bin-size >= general-bin-level
-    [set general-bin-level (general-bin-level + pmd-bin-level) ]   ] ]
+to collect-wastes ;;Either collection at home or central point collection --> This can be analysed
   ;set capacity capacity - bin-level
   ;set bin-level 0
 end
@@ -183,25 +147,8 @@ end
 
     ;set money money + ;[sell price*amount of recycled plastic + recovered energy*energy price - total energy need*energy price]
 ;end
-;ask retirees [
-   ; set pmd pmd + 1
-    ;set organic organic + 1
-    ;set non-pmd non-pmd + 1
-
-;to walk-to-bin
-  ;move-to region-bin 105
-;end
 
 
-;to full-bin
-
-;ask households [
-  ;  ifelse pmd-trashcan-level >= pmd-trashcan-size [  ; if these waste types add up to the max waste the agent will go to the main bins [ walk-to-bin ]
-   ; set pmd-trashcan-level pmd-trashcan-level + separated ; assumption: bin has two blocks for pmd and general waste which have same level
-   ; ]
-    ;ifelse general-trashcan-level >= general-trashcan-size [
-  ;]
-;end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -265,11 +212,11 @@ NIL
 1
 
 PLOT
-792
-99
-992
-249
-general-trashcan-level
+13
+128
+213
+278
+plot 1
 NIL
 NIL
 0.0
@@ -280,7 +227,97 @@ true
 false
 "" ""
 PENS
-"general-trash-level" 1.0 0 -7500403 true "" "plot general-trashcan-level"
+"default" 1.0 0 -16777216 true "" "plot [separated] of household 3"
+
+PLOT
+20
+479
+220
+629
+plot 2
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot [pmd-trashcan-level] of household 3"
+
+PLOT
+286
+482
+486
+632
+plot 3
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot [general-trashcan-level] of household 3"
+
+PLOT
+687
+50
+887
+200
+plot 4
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot [pmd-bin-level] of bin 1"
+
+PLOT
+714
+248
+914
+398
+plot 5
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot [general-bin-level] of bin 0"
+
+PLOT
+14
+299
+214
+449
+plot 6
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot sum [waste] of households"
 
 @#$#@#$#@
 ## WHAT IS IT?
