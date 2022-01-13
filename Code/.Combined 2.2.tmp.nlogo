@@ -120,13 +120,13 @@ end
 
 to dump-pmd-waste
   ask households [ ask bin 1 [
-    ifelse pmd-bin-level  >= pmd-bin-size
+    ifelse pmd-bin-level ) >= pmd-bin-size
     [ ask households
       [ set happy false
         print "no-dump"
       change-satisfactionlevel] ]
     [ ask households
-      [ set pmd-bin-level pmd-bin-level + pmd-trashcan-level
+      [ set pmd-bin-level pmd-bin-level + (sum [pmd-trashcan-level] of households)
       set happy true
       change-satisfactionlevel
       set pmd-trashcan-level 0] ]
