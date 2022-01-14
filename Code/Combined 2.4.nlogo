@@ -33,12 +33,12 @@ to set-up
     ;create-links-with region-bins --> If we want to show the relationship between wastecomps and bins
   ]
 
-  create-households 7  [
-  set id  random 4 ; how we make sure we have 4 different type of agents in agentset, type of household
-  set education-level random 5 ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  set pmd-trashcan-size 100
-  set general-trashcan-size 100
-  set recycle-perception 0.5       ; starting value
+  create-households 5  [
+  set id  random 4                 ; how we make sure we have 4 different type of agents in agentset, type of household
+  set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
+  set pmd-trashcan-size 20         ; assume that bins do not exceed
+  set general-trashcan-size 20     ; assume that bins do not exceed
+  set recycle-perception 0.3       ; starting value
   set bin-satisfaction 0.9         ; starting value, arbitrary
   set xcor -1500 + who * 3
   set shape "house"
@@ -46,20 +46,20 @@ to set-up
   ask households [ create-street-to bin 1 ]
   set size 3
   ( ifelse
-      id = 0 [
-        set r 10
+      id = 0 [   ; family
+        set r 2
         set color green
       ]
-      id = 1 [
-        set r 5
+      id = 1 [   ; couple
+        set r 1.7
         set color brown
       ]
-      id = 2 [
-        set r 4
+      id = 2 [  ; retiree
+        set r 1.5
         set color pink
       ]
-      id = 3 [
-        set r 3
+      id = 3 [  ; single
+        set r 1
         set color white
       ])
   ]
@@ -68,44 +68,65 @@ end
 
 to go
   if ticks >= 1000 [ stop ]; we will also look at it
-  ask households [
+  ifelse separation-at-home = true
+  [ask households [
     produce-waste ;it is function
-    change-perceptionlevel
-  ]
-  ask wastecomps [
-  set counterpmd counterpmd + 1
-  set countergen countergen + 1
-  collect-waste
+    manage-waste
+    change-perceptionlevel]
+
+   ask wastecomps [
+   set counterpmd counterpmd + 1
+   set countergen countergen + 1
+      collect-waste ]
   ;recycle-plastics
   ;recover-residuals
   ;earn-money
   ]
+  [ask households [
+    produce-waste
+    manage-all
+    change-perceptionlevel ]
+   ask wastecomps [
+    set counterpmd counterpmd + 1
+    set countergen countergen + 1
+      collect-waste ]
+      ;recycle-plastics
+      ;recover-residuals
+      ;earn-money]
+    ]
   tick
+  ask households [ set waste 0]
 end
 
 
 to produce-waste  ;create a function with r that represents different agentsets , if else will  be used [
-    set waste waste + r *  ((490 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52
+    set waste waste + r *  ((490 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52   ; prodcuction of household per week in kg
+end
+
+to manage-waste
     set separated  waste * recycle-perception
     set non-separated  waste - separated
     set general-trashcan-level (non-separated + general-trashcan-level)
     set pmd-trashcan-level (separated + pmd-trashcan-level)
-    manage-waste
-    set waste 0
-end
-
-to manage-waste
   ifelse general-trashcan-level >= general-trashcan-size
       [ dump-general-waste ]
-      [ print "hallo"
+      [ print "still collecting general"
       set general-trashcan-level general-trashcan-level + non-separated ]
   ifelse pmd-trashcan-level >= pmd-trashcan-size
       [ dump-pmd-waste ]
-      [ print "hallo wereld"
+      [ print "still collecting pmd"
         set pmd-trashcan-level pmd-trashcan-level + separated ]
 end
 
-to dump-general-waste
+to manage-all  ; only applicable in the no separation at home scenario
+  set general-trashcan-level general-trashcan-level + waste
+  ifelse general-trashcan-level >= general-trashcan-size
+      [ dump-general-waste ]
+      [ print "still collecting general"
+      set general-trashcan-level general-trashcan-level + waste ]
+end
+
+to dump-general-waste    ; same in both scenarios
   ifelse [general-bin-level] of bin 1 >= [general-bin-size] of bin 1
      [ set happy false
        print "no general dump"
@@ -117,7 +138,7 @@ to dump-general-waste
       set general-trashcan-level 0 ]
 end
 
-to dump-pmd-waste
+to dump-pmd-waste   ; not applicable in the no separation at home scenario
   ifelse [pmd-bin-level] of bin 0  >= [pmd-bin-size] of bin 0
       [set happy false
        print "no pmd dump"
@@ -129,15 +150,20 @@ to dump-pmd-waste
       set pmd-trashcan-level 0]
 end
 
-
-
-
 to change-satisfactionlevel
   ifelse happy = true
-    [ifelse bin-satisfaction >= 1       ; This function makes sure that bin-satisfaction cannot be higher than 1
+    [ifelse bin-satisfaction >= 0.95238      ; This function makes sure that bin-satisfaction cannot be higher than 1
       [set bin-satisfaction 1]
       [set bin-satisfaction bin-satisfaction * 1.05]]; satisfied = satisfaction level increases %5.
     [set bin-satisfaction bin-satisfaction * 0.95]  ; dissatisfied = satisfaction level decreases %5. It can never reach 0
+end
+
+to change-perceptionlevel
+  if recycle-perception < mean [recycle-perception] of other households in-radius 5
+    [ifelse recycle-perception >= 0.490196      ; This function makes sure that recycle-perception cannot be higher than 0.5
+      [set recycle-perception 0.5]
+      [set recycle-perception (recycle-perception / mean [recycle-perception] of other households in-radius 5) * recycle-perception ; multiply its own recycle percption by the % difference with the neighbors
+       print mean [recycle-perception] of other households in-radius 5]];
 end
 
 
@@ -256,10 +282,10 @@ NIL
 1
 
 PLOT
-695
-21
-895
-171
+677
+12
+877
+162
 trashcan level hh
 NIL
 NIL
@@ -274,10 +300,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot [pmd-trashcan-level] of household 3"
 
 PLOT
-694
-174
-894
-324
+677
+167
+877
+317
 bin 1 general-level
 NIL
 NIL
@@ -292,10 +318,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot [general-bin-level] of bin 1"
 
 PLOT
-693
-331
-893
-481
+677
+322
+877
+472
 bin 0 pmd-level
 NIL
 NIL
@@ -310,10 +336,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot [pmd-bin-level] of bin 0"
 
 PLOT
-930
-122
-1130
-272
+895
+167
+1095
+317
 bin 0 general level
 NIL
 NIL
@@ -328,10 +354,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot [general-bin-level] of bin 1"
 
 PLOT
-974
-328
-1174
-478
+895
+322
+1095
+472
 general hh 3
 NIL
 NIL
@@ -344,6 +370,53 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot [general-trashcan-level] of household 3"
+
+PLOT
+895
+12
+1095
+162
+waste
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot sum [waste] of households"
+
+SWITCH
+46
+175
+211
+209
+Separation-at-home
+Separation-at-home
+0
+1
+-1000
+
+PLOT
+8
+267
+208
+417
+Satisfaction
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot mean [bin-satisfaction] of households"
 
 @#$#@#$#@
 ## WHAT IS IT?

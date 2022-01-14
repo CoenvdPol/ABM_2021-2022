@@ -144,7 +144,6 @@ end
     ;set money money + ;[sell price*amount of recycled plastic + recovered energy*energy price - total energy need*energy price]
 ;end
 
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
