@@ -9,7 +9,7 @@ wastecomps-own [counterpmd countergen capacity energy money];  ;not sure how to 
 ; bins-own [pmd-bin-size pmd-bin-level general-bin-size general-bin-level] ; bins in the region
 ;trashcans-own [pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ; trashcan at households home
 
-directed-link-breed [streets street]
+; directed-link-breed [streets street]
 
 to set-up
   clear-all
@@ -33,7 +33,7 @@ to set-up
     ;create-links-with region-bins --> If we want to show the relationship between wastecomps and bins
   ]
 
-  create-households  60 [
+  create-households  Number-of-households [
   set id  random 4                 ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 20         ; assume that bins do not exceed
@@ -46,14 +46,14 @@ to set-up
     [setxy (-1500 + who * 3) 750]
     if who <= 15 and who > 10
     [setxy -750 (-1500 + who * 3)]
-    if who <= 20 and who > 15
+    if who <= 60 and who > 15
     [setxy 750 (-1500 + who * 3)]
 
 
 
   set shape "house"
-  ask households [ create-street-to bin 0 ]
-  ask households [ create-street-to bin 1 ]
+  ;ask households [ create-street-to bin 0 ]
+  ;ask households [ create-street-to bin 1 ]
   set size 3
   ( ifelse
       id = 0 [   ; family
@@ -188,6 +188,7 @@ end
 
 ;to recycle-plastics
   ;model how to recycle based on some attributes such as waste and etc. wasteamount*recyclepercentage
+; currently 54 percent recyling
 ;end
 
 ;to offer
@@ -427,6 +428,21 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot mean [bin-satisfaction] of households"
+
+SLIDER
+24
+125
+199
+158
+Number-of-households
+Number-of-households
+0
+100
+24.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
