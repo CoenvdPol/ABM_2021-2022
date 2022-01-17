@@ -39,9 +39,9 @@ to set-up
   set general-trashcan-size 20     ; assume that bins do not exceed
   set recycle-perception 0.3       ; starting value
   set bin-satisfaction 0.9         ; starting value, arbitrary
-    if who <= 25
+    if who <= 13
     [setxy (-1500 + who * 3) -750 ]
-    if who <= 100 and who > 25
+    if who <=  and who > 13
     [setxy (-1500 + who * 3) 750]
   set shape "house"
   set size 3
@@ -388,15 +388,15 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot mean [bin-satisfaction] of households"
 
 SLIDER
-30
-120
-231
-153
+8
+109
+209
+142
 number-of-households
 number-of-households
 0
-60
-55.0
+26
+26.0
 1
 1
 NIL
