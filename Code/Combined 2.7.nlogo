@@ -4,10 +4,7 @@ breed [bins bin]
 breed [wastecomps wastecomp ]
 breed [trashcans trashcan]
 households-own [max-recycling-level pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level separated non-separated waste id education-level recycle-perception bin-satisfaction r happy]
-;households-own [id education-level recycle-perception bin-satisfaction separated non-separated waste r pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ;
 wastecomps-own [ counterpmd countergen capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
-; bins-own [pmd-bin-size pmd-bin-level general-bin-size general-bin-level] ; bins in the region
-;trashcans-own [pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ; trashcan at households home
 
 
 to set-up
@@ -32,7 +29,6 @@ to set-up
     set capacity 10000 ;assume factory has enough capacity to recycle
     set energy 0 ; think it operates as steady state
     set money 0; think it is like a profit
-    ;create-links-with region-bins --> If we want to show the relationship between wastecomps and bins
   ]
 
   create-households number-of-households [
@@ -110,9 +106,6 @@ to go
       collect-waste
       recycle-general-pmd
       recycle-organic]
-      ;recycle-plastics
-      ;recover-residuals
-      ;earn-money]
     ]
   tick
   ask households [ set waste 0]
@@ -199,16 +192,15 @@ end
 
 to recycle-general-pmd
    ifelse technology = "Basic"
-    [ set recycled-general general-collected * %-pmd * 0.6 ] ; depends on the qulity of the technology
+    [ set recycled-general general-collected * %-pmd * 0.6 ] ; depends on the quality of the technology
     [ set recycled-general general-collected * %-pmd * 0.8 ] ; idem
 end
 
 to recycle-organic
   ifelse technology = "Basic"
-    [ set recycled-organic general-collected * %-organic * 0.6 ] ; depends on the qulity of the technology
+    [ set recycled-organic general-collected * %-organic * 0.6 ] ; depends on the quality of the technology
     [ set recycled-organic general-collected * %-organic * 0.8 ] ;idem
 end
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -400,7 +392,7 @@ number-of-households
 number-of-households
 0
 26
-4.0
+15.0
 1
 1
 NIL

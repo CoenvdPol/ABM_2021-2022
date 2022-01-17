@@ -1,18 +1,17 @@
-
-globals [pmd-bin-size pmd-bin-level general-bin-size general-bin-level recycled-general recycle-ratio recycled-separated-plastic]
+globals [%-organic %-general %-pmd pmd-bin-size pmd-bin-level general-bin-size general-bin-level recycled-general recycled-organic recycled-pmd general-collected pmd-collected recycle-ratio ]
 breed [households household]
 breed [bins bin]
 breed [wastecomps wastecomp ]
 breed [trashcans trashcan]
-households-own [pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level separated non-separated waste id education-level recycle-perception bin-satisfaction r happy]
-;households-own [id education-level recycle-perception bin-satisfaction separated non-separated waste r pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ;
-wastecomps-own [counterpmd countergen capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
-; bins-own [pmd-bin-size pmd-bin-level general-bin-size general-bin-level] ; bins in the region
-;trashcans-own [pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ; trashcan at households home
+households-own [max-recycling-level pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level separated non-separated waste id education-level recycle-perception bin-satisfaction r happy]
+wastecomps-own [ counterpmd countergen capacity energy money];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
 
 
 to set-up
   clear-all
+  set %-organic 0.37 ; need clarificaiton and explanation
+  set %-general 0.53
+  set %-pmd     0.10
     ask patches [
     set pcolor black
   ]
@@ -30,7 +29,6 @@ to set-up
     set capacity 10000 ;assume factory has enough capacity to recycle
     set energy 0 ; think it operates as steady state
     set money 0; think it is like a profit
-    ;create-links-with region-bins --> If we want to show the relationship between wastecomps and bins
   ]
 
   create-households number-of-households [
@@ -38,7 +36,7 @@ to set-up
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 20         ; assume that bins do not exceed
   set general-trashcan-size 20     ; assume that bins do not exceed
-  set recycle-perception 0.3       ; starting value
+  set max-recycling-level 0.47
   set bin-satisfaction 0.9         ; starting value, arbitrary
     if who <= 13
     [setxy (-1500 + who * 3) -750 ]
@@ -63,56 +61,74 @@ to set-up
         set r 1
         set color white
       ])
+    ( ifelse
+      education-level = 0 [   ; grammar
+        set recycle-perception 0.4
+      ]
+      education-level = 1 [   ; secondary schooling
+        set recycle-perception 0.5
+      ]
+      education-level = 2 [  ;  MBO
+        set recycle-perception 0.6
+      ]
+      education-level = 3 [  ;HBO
+        set recycle-perception 0.7 ;
+      ]
+      education-level = 4 [  ;University
+        set recycle-perception 0.8
+      ]
+      )
   ]
   reset-ticks
 end
 
 to go
   if ticks >= 1000 [ stop ]; we will also look at it
-  ifelse separation-at-home = true
-  [ask households [
-    produce-waste ;it is function
-    manage-waste
-    change-perceptionlevel]
+    ifelse separation-at-home = true
+     [ask households [
+      produce-waste ;it is function
+     manage-waste
+     change-perceptionlevel]
 
-   ask wastecomps [
-   set counterpmd counterpmd + 1
-   set countergen countergen + 1
-      collect-waste ]
-  ;recycle-plastics
-  ;recover-residuals
-  ;earn-money
-  ]
-  [ask households [
-    produce-waste
-    manage-all
-    change-perceptionlevel ]
-   ask wastecomps [
-    set counterpmd counterpmd + 1
-    set countergen countergen + 1
-      collect-waste ]
-      ;recycle-plastics
-      ;recover-residuals
-      ;earn-money]
+    ask wastecomps [
+     set counterpmd counterpmd + 1
+     set countergen countergen + 1
+     collect-waste
+     recycle-pmd-and-general-bin
+     recycle-organic
+     calculate-recycle-ratio]
+    ]
+    [ask households [
+      produce-waste
+      manage-all
+      change-perceptionlevel ]
+     ask wastecomps [
+      set counterpmd counterpmd + 1
+      set countergen countergen + 1
+      collect-waste
+      recycle-general-pmd
+      recycle-organic
+      calculate-recycle-ratio]
     ]
   tick
   ask households [ set waste 0]
+  set general-collected 0
 end
 
 
 to produce-waste  ;create a function with r that represents different agentsets , if else will  be used [
-    set waste waste + r *  ((490 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52   ; prodcuction of household per week in kg
+    set waste waste + r *  ((376.4 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52   ; prodcuction of waste per person per week in kg
 end
 
 to manage-waste
-    set separated  waste * recycle-perception
+    set separated  waste * recycle-perception * max-recycling-level
     set non-separated  waste - separated
     set general-trashcan-level (non-separated + general-trashcan-level)
     set pmd-trashcan-level (separated + pmd-trashcan-level)
   ifelse general-trashcan-level >= general-trashcan-size
       [ dump-general-waste ]
       [ print "still collecting general"
-      set general-trashcan-level general-trashcan-level + non-separated ]
+        set general-trashcan-level general-trashcan-level + non-separated ]
   ifelse pmd-trashcan-level >= pmd-trashcan-size
       [ dump-pmd-waste ]
       [ print "still collecting pmd"
@@ -160,40 +176,54 @@ to change-satisfactionlevel
 end
 
 to change-perceptionlevel
-  if recycle-perception < mean [recycle-perception] of other households in-radius 5
-    [ifelse recycle-perception >= 0.490196      ; This function makes sure that recycle-perception cannot be higher than 0.5
-      [set recycle-perception 0.5]
-      [set recycle-perception (recycle-perception / mean [recycle-perception] of other households in-radius 5) * recycle-perception ; multiply its own recycle percption by the % difference with the neighbors
-       print mean [recycle-perception] of other households in-radius 5]];
+  if recycle-perception < (mean [recycle-perception] of other households in-radius 5)
+    [ifelse recycle-perception >= 0.95238      ; This function makes sure that recycle-perception cannot be higher than 1
+      [set recycle-perception 1]
+      [set recycle-perception ((((mean [recycle-perception] of other households in-radius 5) - recycle-perception)/(mean [recycle-perception] of other households in-radius 5)) + 1 ) * recycle-perception ; multiply its own recycle perception by the % difference with the neighbors
+        print mean [recycle-perception] of other households in-radius 5]];
 end
 
 
 to collect-waste ;;Either collection at home or central point collection --> This can be analysed
   if  counterpmd >= 7
-      [ set pmd-bin-level 0
+      [ set pmd-collected pmd-bin-level
+        set pmd-bin-level 0
         set counterpmd 0]
   if  countergen >= 5
-      [ set general-bin-level 0
-        set countergen 0]
+      [ set general-collected general-bin-level
+        set general-bin-level 0
+        set countergen 0 ]
 end
 
-to recycle-general-plastics
-  set recycled-general general-bin-level * 0.55   ; we have reference for it, model how to recycle based on some attributes such as waste and etc. wasteamount*recyclepercentage
-  set recycle-ratio recycled-general / waste
+to recycle-pmd-and-general-bin
+   ifelse technology = "Basic"
+    [ set recycled-pmd general-collected * %-pmd * 0.6 + pmd-collected * 0.8] ; depends on the quality of the technology    ; the ratio for pmd collection should be find.
+    [ set recycled-pmd general-collected * %-pmd * 0.8 + pmd-collected * 0.8] ; idem
 end
 
-to recycle-separated-plastics
-  set recycled-separated-plastic pmd-bin-level * 0.65 + general-bin-level * 0.55
-  set recycle-ratio recycled-separated-plastic / waste
+to recycle-general-pmd
+   ifelse technology = "Basic"
+    [ set recycled-general general-collected * %-pmd * 0.6] ; depends on the quality of the technology
+    [ set recycled-general general-collected * %-pmd * 0.8] ; idem
 end
 
+to recycle-organic
+  ifelse technology = "Basic"
+    [ set recycled-organic general-collected * %-organic * 0.6] ; depends on the quality of the technology
+    [ set recycled-organic general-collected * %-organic * 0.8] ;idem
+end
 
+to calculate-recycle-ratio
+  if (general-collected > 0 ) or (pmd-collected > 0 )
+  [set recycle-ratio (recycled-organic + recycled-general + recycled-pmd) / (general-collected + pmd-collected)]
+  ;[set recycle-ratio ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-216
-16
-647
-448
+231
+15
+662
+447
 -1
 -1
 12.82
@@ -255,7 +285,7 @@ PLOT
 12
 877
 162
-trashcan level hh
+PMD Trashcan Level HH 3
 NIL
 NIL
 0.0
@@ -266,14 +296,14 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot [pmd-trashcan-level] of household 3"
+"default" 1.0 0 -2674135 true "" "plot [pmd-trashcan-level] of household 3"
 
 PLOT
 677
 167
 877
 317
-bin 1 general-level
+General Bin 1 Level
 NIL
 NIL
 0.0
@@ -291,7 +321,7 @@ PLOT
 322
 877
 472
-bin 0 pmd-level
+PMD Bin Level Bin 0
 NIL
 NIL
 0.0
@@ -305,29 +335,11 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot [pmd-bin-level] of bin 0"
 
 PLOT
-895
-167
-1095
-317
-bin 0 general level
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot [general-bin-level] of bin 1"
-
-PLOT
-895
-322
-1095
-472
-general hh 3
+897
+11
+1097
+161
+General Trashcan Level HH 3
 NIL
 NIL
 0.0
@@ -341,11 +353,11 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot [general-trashcan-level] of household 3"
 
 PLOT
-895
-12
-1095
-162
-waste
+891
+325
+1091
+475
+Total Waste of Households
 NIL
 NIL
 0.0
@@ -370,11 +382,11 @@ Separation-at-home
 -1000
 
 PLOT
-8
-267
-208
-417
-Satisfaction
+5
+327
+205
+477
+Average-Bin-Satisfaction
 NIL
 NIL
 0.0
@@ -389,18 +401,136 @@ PENS
 
 SLIDER
 8
-109
+110
 209
-142
+143
 number-of-households
 number-of-households
 0
 26
-1.0
+11.0
 1
 1
 NIL
 HORIZONTAL
+
+CHOOSER
+62
+241
+200
+286
+Technology
+Technology
+"Advanced" "Basic"
+1
+
+PLOT
+885
+170
+1085
+320
+General Collected
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot sum [general-collected] of wastecomps"
+
+PLOT
+82
+533
+282
+683
+recycle-perception
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot mean [recycle-perception] of households"
+
+PLOT
+730
+557
+930
+707
+recycled-organic
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot recycled-organic"
+
+PLOT
+1031
+539
+1231
+689
+recycled-general
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot recycled-general"
+
+PLOT
+370
+532
+570
+682
+Recycle ratio
+NIL
+NIL
+0.0
+10.0
+0.0
+0.5
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot recycle-ratio"
+
+PLOT
+1175
+309
+1375
+459
+recycled-pmd
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot recycled-pmd"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -785,18 +915,6 @@ NetLogo 6.2.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
-<experiments>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
-    <setup>set-up</setup>
-    <go>go</go>
-    <metric>recycle-ratio</metric>
-    <enumeratedValueSet variable="Separation-at-home">
-      <value value="true"/>
-      <value value="false"/>
-    </enumeratedValueSet>
-    <steppedValueSet variable="number-of-households" first="1" step="26" last="10"/>
-  </experiment>
-</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
