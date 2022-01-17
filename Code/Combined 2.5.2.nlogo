@@ -9,10 +9,6 @@ wastecomps-own [counterpmd countergen capacity energy money];  ;not sure how to 
 ; bins-own [pmd-bin-size pmd-bin-level general-bin-size general-bin-level] ; bins in the region
 ;trashcans-own [pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level] ; trashcan at households home
 
-<<<<<<< HEAD
-=======
-; directed-link-breed [streets street]
->>>>>>> 5c7d7fe66ab3cb1230ca932a0bf33ec1f44ebe05
 
 to set-up
   clear-all
@@ -36,11 +32,7 @@ to set-up
     ;create-links-with region-bins --> If we want to show the relationship between wastecomps and bins
   ]
 
-<<<<<<< HEAD
   create-households number-of-households [
-=======
-  create-households  Number-of-households [
->>>>>>> 5c7d7fe66ab3cb1230ca932a0bf33ec1f44ebe05
   set id  random 4                 ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 20         ; assume that bins do not exceed
@@ -51,20 +43,7 @@ to set-up
     [setxy (-1500 + who * 3) -750 ]
     if who <= 100 and who > 25
     [setxy (-1500 + who * 3) 750]
-<<<<<<< HEAD
   set shape "house"
-=======
-    if who <= 15 and who > 10
-    [setxy -750 (-1500 + who * 3)]
-    if who <= 60 and who > 15
-    [setxy 750 (-1500 + who * 3)]
-
-
-
-  set shape "house"
-  ;ask households [ create-street-to bin 0 ]
-  ;ask households [ create-street-to bin 1 ]
->>>>>>> 5c7d7fe66ab3cb1230ca932a0bf33ec1f44ebe05
   set size 3
   ( ifelse
       id = 0 [   ; family
@@ -197,42 +176,10 @@ to collect-waste ;;Either collection at home or central point collection --> Thi
         set countergen 0]
 end
 
-<<<<<<< HEAD
 to recycle-general-plastics
   set recycled-general general-bin-level * 0.55   ; we have reference for it, model how to recycle based on some attributes such as waste and etc. wasteamount*recyclepercentage
   set recycle-ratio recycled-general / waste
 end
-=======
-;to recycle-plastics
-  ;model how to recycle based on some attributes such as waste and etc. wasteamount*recyclepercentage
-; currently 54 percent recyling
-;end
-
-;to offer
-  ;ifelse technology != "new"  ;assign a cost for it
-  ;[set cost 35]; It's guessed number, it can be taken from real case data or can be dependent on gas price
-  ;[set cost 20]
- ; ifelse contract-price>cost ;make an offer to municipalities between 3 en 20  Kton/year; specify fine; it can not exceed maximum capacity of the facilities
-
-;end
-
-
-;to recover-residuals
-  ;recover energy from residual (the total weight - recycled weight)*Energy efficency = obtained energy
-;end
-
-;to earn-money
-  ;ask wastecomps [
-   ; ifelse wasteamount<contractamount; it needs change
-    ;set money money + ;[Specify fines]
-
-    ;set money money + ;[sell price*amount of recycled plastic + recovered energy*energy price - total energy need*energy price]
-;end
-;ask retirees [
-   ; set pmd pmd + 1
-    ;set organic organic + 1
-    ;set non-pmd non-pmd + 1
->>>>>>> 5c7d7fe66ab3cb1230ca932a0bf33ec1f44ebe05
 
 to recycle-separated-plastics
   set recycled-separated-plastic pmd-bin-level * 0.65 + general-bin-level * 0.55
@@ -441,7 +388,6 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot mean [bin-satisfaction] of households"
 
 SLIDER
-<<<<<<< HEAD
 30
 120
 231
@@ -451,17 +397,6 @@ number-of-households
 0
 60
 55.0
-=======
-24
-125
-199
-158
-Number-of-households
-Number-of-households
-0
-100
-24.0
->>>>>>> 5c7d7fe66ab3cb1230ca932a0bf33ec1f44ebe05
 1
 1
 NIL
