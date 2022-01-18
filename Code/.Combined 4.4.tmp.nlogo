@@ -226,8 +226,8 @@ end
 to calculate-recycle-ratio
 if ticks >= 10 [
     ifelse technology =  "Basic"
-    [set recycle-ratio percentage-separate + pmd-missing * 0.6]
-    [set recycle-ratio percentage-separate + pmd-missing * 0.8]]
+    [    set recycle-ratio percentage-separate + pmd-missing * 0.6]
+    [set recycle-ratio percentage-separate + pmd-missing * 0.8]
 end
 
 
@@ -435,7 +435,7 @@ CHOOSER
 Technology
 Technology
 "Advanced" "Basic"
-1
+0
 
 PLOT
 885
@@ -547,7 +547,7 @@ pmd-regionbin-size
 pmd-regionbin-size
 50
 400
-150.0
+250.0
 50
 1
 NIL
@@ -562,7 +562,7 @@ general-regionbin-size
 general-regionbin-size
 100
 800
-200.0
+400.0
 100
 1
 NIL
@@ -577,7 +577,7 @@ nmbr-weeks-pickup-gen
 nmbr-weeks-pickup-gen
 1
 3
-1.0
+3.0
 1
 1
 NIL
