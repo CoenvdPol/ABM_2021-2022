@@ -1,16 +1,16 @@
 globals [percentage-separate pmd-missing %-organic %-general %-pmd pmd-bin-size pmd-bin-level general-bin-size general-bin-level recycled-general recycled-organic
-  recycled-pmd general-collected pmd-collected recycle-ratio recycle-perception-neigh]
+  recycled-pmd general-collected pmd-collected recycle-ratio recycle-perception-neigh %-single %-family %-retiree %-couple]
 breed [households household]
 breed [bins bin]
 breed [wastecomps wastecomp ]
 breed [trashcans trashcan]
 households-own [ waste pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level separated non-separated id education-level recycle-perception bin-satisfaction r happy]
-wastecomps-own [ collected-pmd collected-gen counterpmd countergen];  ;not sure how to interpret technology for specific turtle -->< breed function can be used; trucks should be seperate agent; cost trucks (another variables)
+wastecomps-own [ collected-pmd collected-gen counterpmd countergen]
 
 
 to set-up
   clear-all
-  set %-organic 0.37 ; need clarificaiton and explanation; Retreived from Milieucentraal
+  set %-organic 0.37 ; Retreived from Milieucentraal
   set %-general 0.53
   set %-pmd     0.10
     ask patches [
@@ -21,7 +21,7 @@ to set-up
     set color red
     set size 2
     set xcor -300 + who * 600          ; location of bins
-    set general-bin-size general-regionbin-size            ; we can also make it decision variable
+    set general-bin-size general-regionbin-size
     set pmd-bin-size pmd-regionbin-size
   ]
   create-wastecomps 1[
@@ -31,7 +31,7 @@ to set-up
   ]
 
   create-households number-of-households [
-  set number-of-fam = number-of-households *id random 4                ; how we make sure we have 4 different type of agents in agentset, type of household
+  set id  random 4                 ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 10        ; assume that bins do not exceed
   set general-trashcan-size 30     ; assume that bins do not exceed
@@ -46,18 +46,22 @@ to set-up
       id = 0 [   ; family
         set r 2
         set color green
+        set %-family ((count ( households with [id = 0 ]) / number-of-households)) * 100
       ]
       id = 1 [   ; couple
         set r 1.7
         set color brown
+        set %-couple ((count ( households with [id = 1 ]) / number-of-households)) * 100
       ]
       id = 2 [  ; retiree
         set r 1.5
         set color pink
+        set %-retiree ((count ( households with [id = 2 ]) / number-of-households)) * 100
       ]
       id = 3 [  ; single
         set r 1
         set color white
+        set %-single ((count ( households with [id = 3 ]) / number-of-households)) * 100
       ])
     ( ifelse
       education-level = 0 [   ; grammar
@@ -84,7 +88,7 @@ to go
   if ticks >= 520 [ stop ]; 10 years
     ifelse separation-at-home = true
      [ask households [
-      produce-waste ;it is function
+      produce-waste
       manage-waste
       change-perceptionlevel]
 
@@ -113,7 +117,7 @@ to go
 end
 
 
-to produce-waste  ;create a function with r that represents different agentsets , if else will  be used [
+to produce-waste
     set waste waste + r *  ((376.4 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52   ; prodcuction of waste per person per week in kg
 end
 
@@ -177,7 +181,7 @@ end
 
 to change-perceptionlevel
   set recycle-perception-neigh mean [recycle-perception] of other households in-radius 5
-  ifelse recycle-perception <= recycle-perception-neigh and recycle-perception != 0  ; if it is higher
+  ifelse recycle-perception <= recycle-perception-neigh and recycle-perception != 0
     [ifelse recycle-perception >= (recycle-perception-neigh / (2 * recycle-perception-neigh - recycle-perception ))  ; This function makes sure that recycle-perception cannot be higher than 1
       [set recycle-perception recycle-perception * bin-satisfaction
       ;print "lower perception, close to 1"
@@ -535,7 +539,7 @@ pmd-regionbin-size
 pmd-regionbin-size
 50
 400
-300.0
+50.0
 50
 1
 NIL

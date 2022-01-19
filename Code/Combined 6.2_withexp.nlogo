@@ -1,11 +1,11 @@
 globals [percentage-separate pmd-missing %-organic %-general %-pmd pmd-bin-size pmd-bin-level general-bin-size general-bin-level recycled-general recycled-organic
-  recycled-pmd general-collected pmd-collected recycle-ratio recycle-perception-neigh %-single %-family %-retiree %-couple]
+  recycled-pmd general-collected pmd-collected recycle-ratio recycle-perception-neigh %-family %-single %-retiree %-couple]
 breed [households household]
 breed [bins bin]
 breed [wastecomps wastecomp ]
 breed [trashcans trashcan]
 households-own [ waste pmd-trashcan-size pmd-trashcan-level general-trashcan-size general-trashcan-level separated non-separated id education-level recycle-perception bin-satisfaction r happy]
-wastecomps-own [ collected-pmd collected-gen counterpmd countergen]
+wastecomps-own [ collected-pmd collected-gen counterpmd countergen];
 
 
 to set-up
@@ -31,7 +31,7 @@ to set-up
   ]
 
   create-households number-of-households [
-  set id  random 4                 ; how we make sure we have 4 different type of agents in agentset, type of household
+  set id random 4                ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 10        ; assume that bins do not exceed
   set general-trashcan-size 30     ; assume that bins do not exceed
@@ -116,7 +116,7 @@ to go
 end
 
 
-to produce-waste
+to produce-waste  ;create a function with r that represents different agentsets behaviour
     set waste r *  ((376.4 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52   ; prodcuction of waste per person per week in kg
 end
 
@@ -180,7 +180,7 @@ end
 
 to change-perceptionlevel
   set recycle-perception-neigh mean [recycle-perception] of other households in-radius 5
-  ifelse recycle-perception <= recycle-perception-neigh and recycle-perception != 0
+  ifelse recycle-perception <= recycle-perception-neigh and recycle-perception != 0  ; if it is higher
     [ifelse recycle-perception >= (recycle-perception-neigh / (2 * recycle-perception-neigh - recycle-perception ))  ; This function makes sure that recycle-perception cannot be higher than 1
       [set recycle-perception recycle-perception * bin-satisfaction
       ;print "lower perception, close to 1"
@@ -216,7 +216,7 @@ end
 
 to recycle-pmd-at-home  ; only applicable when pmd is separated at home
    ifelse technology = "Basic"
-    [ set recycled-pmd  pmd-collected + (general-collected * pmd-missing * 0.6)] ; depends on the quality of the technology    ; the ratio for pmd collection should be find.
+    [ set recycled-pmd  pmd-collected + (general-collected * pmd-missing * 0.6)] ; depends on the quality of the technology
     [ set recycled-pmd  pmd-collected + (general-collected * pmd-missing * 0.8)] ; idem
 end
 
@@ -538,7 +538,7 @@ pmd-regionbin-size
 pmd-regionbin-size
 50
 400
-50.0
+300.0
 50
 1
 NIL
