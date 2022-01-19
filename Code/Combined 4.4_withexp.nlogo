@@ -144,12 +144,12 @@ end
 to dump-general-waste    ; same in both scenarios
   ifelse [general-bin-level] of bin 1 >= [general-bin-size] of bin 1
      [ set happy false
-       print "no general dump"
+       ;print "no general dump"
        change-satisfactionlevel
        set general-trashcan-level 0]   ; assume that people will still dump their waste but just besides the bin
      [set general-bin-level general-bin-level + general-trashcan-level
       set happy true
-      print "hallo"
+      ;print "hallo"
       change-satisfactionlevel
       set general-trashcan-level 0 ]
 end
@@ -157,7 +157,7 @@ end
 to dump-pmd-waste   ; not applicable in the no separation at home scenario
   ifelse [pmd-bin-level] of bin 0  >= [pmd-bin-size] of bin 0
       [set happy false
-       print "no pmd dump"
+       ;print "no pmd dump"
        change-satisfactionlevel
        set pmd-trashcan-level 0]  ; assume that people will still dump their waste but just besides the bin
       [set pmd-bin-level pmd-bin-level + pmd-trashcan-level
@@ -178,16 +178,20 @@ to change-perceptionlevel
   ifelse recycle-perception <= (mean [recycle-perception] of other households in-radius 5) and recycle-perception != 0
     [ifelse recycle-perception >= 0.954      ; This function makes sure that recycle-perception cannot be higher than 1
       [set recycle-perception recycle-perception * bin-satisfaction
-      print "lower perception, close to 1"]
+      ;print "lower perception, close to 1"
+      ]
       [set recycle-perception (((((mean [recycle-perception] of other households in-radius 5) - recycle-perception)/(mean [recycle-perception] of other households in-radius 5)) + 1 ) * recycle-perception) * bin-satisfaction
-      print "lower perception, not close to 1"]] ; multiply its own recycle perception by the % difference with the neighbors
+      ;print "lower perception, not close to 1"
+  ]] ; multiply its own recycle perception by the % difference with the neighbors
    [ifelse recycle-perception <= 0.01
      [set recycle-perception recycle-perception + 0.05]
      [ifelse recycle-perception >= 0.99
       [set recycle-perception recycle-perception * bin-satisfaction
-      print "higher perception, close to 1"]
+      ;print "higher perception, close to 1"
+      ]
       [set recycle-perception recycle-perception * 1.05 * bin-satisfaction
-     print "higher perception, not close to 1"] ]
+     ;print "higher perception, not close to 1"
+    ] ]
   ];
 end
 
@@ -389,7 +393,7 @@ SWITCH
 138
 Separation-at-home
 Separation-at-home
-0
+1
 1
 -1000
 
@@ -420,7 +424,7 @@ number-of-households
 number-of-households
 0
 26
-25.0
+26.0
 1
 1
 NIL
@@ -434,7 +438,7 @@ CHOOSER
 Technology
 Technology
 "Advanced" "Basic"
-1
+0
 
 PLOT
 885
@@ -546,7 +550,7 @@ pmd-regionbin-size
 pmd-regionbin-size
 50
 400
-150.0
+300.0
 50
 1
 NIL
@@ -561,7 +565,7 @@ general-regionbin-size
 general-regionbin-size
 100
 800
-200.0
+400.0
 100
 1
 NIL
@@ -576,7 +580,7 @@ nmbr-weeks-pickup-gen
 nmbr-weeks-pickup-gen
 1
 3
-1.0
+3.0
 1
 1
 NIL
@@ -591,7 +595,7 @@ nmbr-weeks-pickup-pmd
 nmbr-weeks-pickup-pmd
 1
 3
-1.0
+3.0
 1
 1
 NIL
