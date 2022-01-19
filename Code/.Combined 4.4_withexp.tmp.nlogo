@@ -30,7 +30,7 @@ to set-up
   ]
 
   create-households number-of-households [
-  set id  random 4                 ; how we make sure we have 4 different type of agents in agentset, type of household
+  set id                   ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 10        ; assume that bins do not exceed
   set general-trashcan-size 30     ; assume that bins do not exceed
@@ -80,7 +80,7 @@ to set-up
 end
 
 to go
-  if ticks >= 1000 [ stop ]; we will also look at it
+  if ticks >= 520 [ stop ]; 10 years
     ifelse separation-at-home = true
      [ask households [
       produce-waste ;it is function
@@ -230,11 +230,10 @@ end
 to calculate-recycle-ratio
 if ticks >= 10 [
     ifelse separation-at-home = true
-[
-      ifelse technology =  "Basic"
-       [set recycle-ratio percentage-separate + pmd-missing * 0.6 * 100]
-       [set recycle-ratio percentage-separate + pmd-missing * 0.8 * 100]
-      [set recycle-ratio recycled-pmd / general-collected * 100] ] ]
+    [ifelse technology =  "Basic"
+      [set recycle-ratio (percentage-separate + (pmd-missing * 0.6)) * 100]
+      [set recycle-ratio (percentage-separate + (pmd-missing * 0.8)) * 100] ]
+     [set recycle-ratio recycled-pmd / general-collected * 100] ]
 end
 
 @#$#@#$#@
@@ -396,7 +395,7 @@ SWITCH
 138
 Separation-at-home
 Separation-at-home
-1
+0
 1
 -1000
 
@@ -441,7 +440,7 @@ CHOOSER
 Technology
 Technology
 "Advanced" "Basic"
-0
+1
 
 PLOT
 885
@@ -480,35 +479,17 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot mean [recycle-perception] of households"
 
 PLOT
-595
-530
-795
-680
-recycled-organic
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot recycled-organic"
-
-PLOT
-369
-513
-569
-663
+347
+515
+667
+665
 Recycle ratio
 NIL
 NIL
 0.0
 10.0
 0.0
-0.5
+10.0
 true
 false
 "" ""
@@ -583,7 +564,7 @@ nmbr-weeks-pickup-gen
 nmbr-weeks-pickup-gen
 1
 3
-3.0
+2.0
 1
 1
 NIL
@@ -598,7 +579,7 @@ nmbr-weeks-pickup-pmd
 nmbr-weeks-pickup-pmd
 1
 3
-3.0
+2.0
 1
 1
 NIL
@@ -656,17 +637,6 @@ MONITOR
 NIL
 count households with [education-level = 1]
 0
-1
-11
-
-MONITOR
-919
-493
-999
-538
-NIL
-pmd-missing
-17
 1
 11
 
@@ -751,24 +721,24 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot mean[non-separated] of households"
 
 MONITOR
-803
-536
-946
-581
+690
+538
+833
+583
 NIL
 pmd-missing
-17
+4
 1
 11
 
 MONITOR
-800
-592
-1055
-637
-NIL
+690
+587
+898
+632
+separated percentage by households
 mean [percentage-separate] of households
-17
+3
 1
 11
 
