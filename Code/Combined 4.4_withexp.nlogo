@@ -235,7 +235,6 @@ if ticks >= 10 [
       [set recycle-ratio (percentage-separate + (pmd-missing * 0.8)) * 100] ]
      [set recycle-ratio recycled-pmd / general-collected * 100] ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 231

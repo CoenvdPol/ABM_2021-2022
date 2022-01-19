@@ -1,4 +1,5 @@
-globals [percentage-separate pmd-missing %-organic %-general %-pmd pmd-bin-size pmd-bin-level general-bin-size general-bin-level recycled-general recycled-organic recycled-pmd general-collected pmd-collected recycle-ratio ]
+globals [percentage-separate pmd-missing %-organic %-general %-pmd pmd-bin-size pmd-bin-level general-bin-size general-bin-level recycled-general recycled-organic
+  recycled-pmd general-collected pmd-collected recycle-ratio recycle-perception-neigh]
 breed [households household]
 breed [bins bin]
 breed [wastecomps wastecomp ]
@@ -30,7 +31,7 @@ to set-up
   ]
 
   create-households number-of-households [
-  set id                   ; how we make sure we have 4 different type of agents in agentset, type of household
+  set id  random 4                 ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 10        ; assume that bins do not exceed
   set general-trashcan-size 30     ; assume that bins do not exceed
@@ -175,12 +176,13 @@ to change-satisfactionlevel
 end
 
 to change-perceptionlevel
-  ifelse recycle-perception <= (mean [recycle-perception] of other households in-radius 5) and recycle-perception != 0
-    [ifelse recycle-perception >= 0.954      ; This function makes sure that recycle-perception cannot be higher than 1
+  set recycle-perception-neigh mean [recycle-perception] of other households in-radius 5
+  ifelse recycle-perception <= recycle-perception-neigh and recycle-perception != 0
+    [ifelse recycle-perception >=     ; This function makes sure that recycle-perception cannot be higher than 1
       [set recycle-perception recycle-perception * bin-satisfaction
       ;print "lower perception, close to 1"
       ]
-      [set recycle-perception (((((mean [recycle-perception] of other households in-radius 5) - recycle-perception)/(mean [recycle-perception] of other households in-radius 5)) + 1 ) * recycle-perception) * bin-satisfaction
+      [set recycle-perception (((((recycle-perception-neigh) - recycle-perception)/(recycle-perception-neigh)) + 1 ) * recycle-perception) * bin-satisfaction
       ;print "lower perception, not close to 1"
   ]] ; multiply its own recycle perception by the % difference with the neighbors
    [ifelse recycle-perception <= 0.01
@@ -235,7 +237,6 @@ if ticks >= 10 [
       [set recycle-ratio (percentage-separate + (pmd-missing * 0.8)) * 100] ]
      [set recycle-ratio recycled-pmd / general-collected * 100] ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 231
