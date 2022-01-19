@@ -31,7 +31,7 @@ to set-up
   ]
 
   create-households number-of-households [
-  set id  random 4                 ; how we make sure we have 4 different type of agents in agentset, type of household
+  set number-of-fam = number-of-households *id random 4                ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 10        ; assume that bins do not exceed
   set general-trashcan-size 30     ; assume that bins do not exceed
@@ -177,8 +177,8 @@ end
 
 to change-perceptionlevel
   set recycle-perception-neigh mean [recycle-perception] of other households in-radius 5
-  ifelse recycle-perception <= recycle-perception-neigh and recycle-perception != 0
-    [ifelse recycle-perception >=     ; This function makes sure that recycle-perception cannot be higher than 1
+  ifelse recycle-perception <= recycle-perception-neigh and recycle-perception != 0  ; if it is higher
+    [ifelse recycle-perception >= (recycle-perception-neigh / (2 * recycle-perception-neigh - recycle-perception ))  ; This function makes sure that recycle-perception cannot be higher than 1
       [set recycle-perception recycle-perception * bin-satisfaction
       ;print "lower perception, close to 1"
       ]
