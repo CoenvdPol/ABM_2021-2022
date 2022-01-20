@@ -504,10 +504,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot recycled-pmd"
 
 MONITOR
-463
-602
-573
-647
+658
+658
+768
+703
 avg recycle perc.
 mean [recycle-perception] of households
 3
