@@ -207,12 +207,12 @@ to collect-waste ;;Either collection at home or central point collection --> Thi
   if  counterpmd >= nmbr-weeks-pickup-pmd
       [ set pmd-collected pmd-collected + pmd-bin-level
         set pmd-bin-level 0
-        print pmd-collected
+        ;print pmd-collected
         set counterpmd 0]
   if  countergen >= nmbr-weeks-pickup-gen
       [ set general-collected general-collected + general-bin-level
         set general-bin-level 0
-        print general-collected
+        ;print general-collected
         set countergen 0 ]
 end
 
@@ -305,10 +305,10 @@ NIL
 1
 
 PLOT
-677
-12
-877
-162
+699
+32
+1265
+153
 PMD Trashcan Level avg
 NIL
 NIL
@@ -323,11 +323,11 @@ PENS
 "default" 1.0 0 -2674135 true "" "plot mean [pmd-trashcan-level] of households"
 
 PLOT
-677
-167
-877
-317
-General Bin 1 Level
+673
+288
+1189
+563
+Bin levels
 NIL
 NIL
 0.0
@@ -335,34 +335,17 @@ NIL
 0.0
 10.0
 true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot [general-bin-level] of bin 1"
-
-PLOT
-677
-322
-877
-472
-PMD Bin Level Bin 0
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
 true
-false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot [pmd-bin-level] of bin 0"
+"general-bin" 1.0 0 -16777216 true "" "plot [general-bin-level] of bin 1"
+"pmd-bin" 1.0 0 -2674135 true "" "plot [pmd-bin-level] of bin 0"
 
 PLOT
-897
-11
-1097
-161
+698
+155
+1267
+280
 General Trashcan Level avg
 NIL
 NIL
@@ -377,10 +360,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot mean[general-trashcan-level] of households"
 
 PLOT
-891
-325
-1091
-475
+1356
+23
+1556
+173
 Total Waste of Households
 NIL
 NIL
@@ -414,7 +397,7 @@ number-of-households
 number-of-households
 0
 26
-26.0
+25.0
 1
 1
 NIL
@@ -431,11 +414,11 @@ Technology
 1
 
 PLOT
-885
-170
-1085
-320
-General Collected
+1203
+298
+1643
+566
+Collected by wastecomps
 NIL
 NIL
 0.0
@@ -446,18 +429,19 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot sum [general-collected] of wastecomps"
+"general-collected" 1.0 0 -2674135 true "" "plot sum [general-collected] of wastecomps"
+"pmd-collected" 1.0 0 -16777216 true "" "plot sum [pmd-collected] of wastecomps"
 
 PLOT
-48
-456
-583
-711
-recycle-perception
+10
+459
+545
+714
+Recycle perception and bin-satisfaction(%)
 NIL
 NIL
 0.0
-10.0
+1040.0
 0.0
 1.0
 true
@@ -468,15 +452,15 @@ PENS
 "bin-satisfaction" 1.0 0 -11085214 true "" "if ticks >= 10 [plot mean [bin-satisfaction] of households]"
 
 PLOT
-785
-563
-1105
-713
+600
+579
+1720
+729
 Recycle ratio
 NIL
 NIL
 0.0
-10.0
+1040.0
 0.0
 10.0
 true
@@ -485,30 +469,12 @@ false
 PENS
 "default" 1.0 0 -16777216 true "" "plot recycle-ratio"
 
-PLOT
-1113
-326
-1313
-476
-recycled-pmd
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot recycled-pmd"
-
 MONITOR
-463
-602
-573
-647
-avg recycle perc.
+436
+649
+566
+695
+avg recycle perception
 mean [recycle-perception] of households
 3
 1
@@ -523,7 +489,7 @@ pmd-regionbin-size
 pmd-regionbin-size
 50
 400
-200.0
+50.0
 50
 1
 NIL
@@ -538,7 +504,7 @@ general-regionbin-size
 general-regionbin-size
 100
 800
-300.0
+700.0
 100
 1
 NIL
@@ -553,7 +519,7 @@ nmbr-weeks-pickup-gen
 nmbr-weeks-pickup-gen
 1
 3
-2.0
+3.0
 1
 1
 NIL
@@ -568,17 +534,17 @@ nmbr-weeks-pickup-pmd
 nmbr-weeks-pickup-pmd
 1
 3
-2.0
+3.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-806
-505
-889
-550
+1698
+385
+1781
+430
 NIL
 recycle-ratio
 3
@@ -586,10 +552,10 @@ recycle-ratio
 11
 
 MONITOR
-465
-535
-583
-580
+436
+592
+564
+638
 avg bin-satisfaction
 mean [bin-satisfaction] of households
 3
@@ -597,10 +563,10 @@ mean [bin-satisfaction] of households
 11
 
 MONITOR
-1398
-560
-1514
-605
+1472
+188
+1588
+233
 avg education level
 mean [education-level] of households
 1
@@ -608,10 +574,10 @@ mean [education-level] of households
 11
 
 MONITOR
-1400
-626
-1503
-671
+1348
+188
+1451
+233
 avg household r
 mean [r] of households
 1
@@ -619,79 +585,10 @@ mean [r] of households
 11
 
 MONITOR
-898
-506
-986
-551
-NIL
-recycled-pmd
-0
-1
-11
-
-MONITOR
-993
-506
-1102
-551
-NIL
-general-collected
-0
-1
-11
-
-PLOT
-1135
-172
-1335
-322
-PMD collected
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot sum [pmd-collected] of wastecomps"
-
-PLOT
-1142
-15
-1342
-165
-non-separated of households
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot mean[non-separated] of households"
-
-MONITOR
-1128
-586
-1271
-631
-NIL
-pmd-missing
-4
-1
-11
-
-MONITOR
-1128
-635
-1336
-680
+1728
+585
+1936
+630
 separated percentage by households
 mean [percentage-separate] of households
 3
