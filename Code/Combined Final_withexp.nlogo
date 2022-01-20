@@ -33,8 +33,8 @@ to set-up
   create-households number-of-households [
   set id random 4                ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  set pmd-trashcan-size 10        ; assume that bins do not exceed
-  set general-trashcan-size 30     ; assume that bins do not exceed
+  set pmd-trashcan-size 10        ; assume that trashcans do not exceed this value (kg)
+  set general-trashcan-size 30     ; assume that trashcans do not exceed this value (kg)
   set bin-satisfaction 0.9        ; starting value, arbitrary
     if who <= 13
     [setxy (-1500 + who * 3) -750 ]
@@ -305,10 +305,10 @@ NIL
 1
 
 PLOT
-699
-32
-1265
-153
+999
+16
+1565
+137
 PMD Trashcan Level avg
 NIL
 NIL
@@ -342,10 +342,10 @@ PENS
 "pmd-bin" 1.0 0 -2674135 true "" "plot [pmd-bin-level] of bin 0"
 
 PLOT
-698
-155
-1267
-280
+998
+139
+1567
+264
 General Trashcan Level avg
 NIL
 NIL
@@ -360,10 +360,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot mean[general-trashcan-level] of households"
 
 PLOT
-1356
-23
-1556
-173
+680
+126
+880
+276
 Total Waste of Households
 NIL
 NIL
@@ -404,9 +404,9 @@ NIL
 HORIZONTAL
 
 CHOOSER
-15
+13
 146
-153
+151
 191
 Technology
 Technology
@@ -481,60 +481,60 @@ mean [recycle-perception] of households
 11
 
 SLIDER
-19
+18
 235
-192
+191
 268
 pmd-regionbin-size
 pmd-regionbin-size
 50
 400
-50.0
+400.0
 50
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+198
+188
+231
+general-regionbin-size
+general-regionbin-size
+100
+800
+400.0
+100
 1
 NIL
 HORIZONTAL
 
 SLIDER
 16
+269
 198
-189
-231
-general-regionbin-size
-general-regionbin-size
-100
-800
-700.0
-100
-1
-NIL
-HORIZONTAL
-
-SLIDER
-18
-270
-200
-303
+302
 nmbr-weeks-pickup-gen
 nmbr-weeks-pickup-gen
 1
 3
-3.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-18
+16
 308
-203
+201
 341
 nmbr-weeks-pickup-pmd
 nmbr-weeks-pickup-pmd
 1
 3
-3.0
+2.0
 1
 1
 NIL
@@ -563,23 +563,12 @@ mean [bin-satisfaction] of households
 11
 
 MONITOR
-1472
-188
-1588
-233
+1626
+189
+1742
+234
 avg education level
 mean [education-level] of households
-1
-1
-11
-
-MONITOR
-1348
-188
-1451
-233
-avg household r
-mean [r] of households
 1
 1
 11
@@ -592,6 +581,61 @@ MONITOR
 separated percentage by households
 mean [percentage-separate] of households
 3
+1
+11
+
+MONITOR
+676
+15
+741
+61
+%-family
+%-family
+0
+1
+11
+
+MONITOR
+676
+69
+744
+115
+NIL
+%-couple
+0
+1
+11
+
+MONITOR
+749
+15
+817
+61
+NIL
+%-retiree
+0
+1
+11
+
+MONITOR
+752
+69
+840
+115
+NIL
+%-single
+0
+1
+11
+
+MONITOR
+823
+15
+983
+61
+avg household waste ratio
+mean [r] of households
+1
 1
 11
 

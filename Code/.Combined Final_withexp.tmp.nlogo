@@ -33,8 +33,8 @@ to set-up
   create-households number-of-households [
   set id random 4                ; how we make sure we have 4 different type of agents in agentset, type of household
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  set pmd-trashcan-size 10        ; assume that bins do not exceed
-  set general-trashcan-size 30     ; assume that bins do not exceed
+  set pmd-trashcan-size 10        ; assume that trashcans do not exceed this value (kg)
+  set general-trashcan-size 30     ; assume that trashcans do not exceed this value (kg)
   set bin-satisfaction 0.9        ; starting value, arbitrary
     if who <= 13
     [setxy (-1500 + who * 3) -750 ]
@@ -305,10 +305,10 @@ NIL
 1
 
 PLOT
-1105
-15
-1305
-136
+1001
+22
+1567
+143
 PMD Trashcan Level avg
 NIL
 NIL
@@ -323,10 +323,10 @@ PENS
 "default" 1.0 0 -2674135 true "" "plot mean [pmd-trashcan-level] of households"
 
 PLOT
-678
-239
-1194
-514
+673
+288
+1189
+563
 Bin levels
 NIL
 NIL
@@ -342,10 +342,10 @@ PENS
 "pmd-bin" 1.0 0 -2674135 true "" "plot [pmd-bin-level] of bin 0"
 
 PLOT
-998
-113
-1567
-238
+999
+145
+1568
+270
 General Trashcan Level avg
 NIL
 NIL
@@ -360,10 +360,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot mean[general-trashcan-level] of households"
 
 PLOT
-723
-49
-923
-199
+680
+126
+880
+276
 Total Waste of Households
 NIL
 NIL
@@ -414,10 +414,10 @@ Technology
 1
 
 PLOT
-1208
-249
-1648
-517
+1203
+298
+1643
+566
 Collected by wastecomps
 NIL
 NIL
@@ -452,10 +452,10 @@ PENS
 "bin-satisfaction" 1.0 0 -11085214 true "" "if ticks >= 10 [plot mean [bin-satisfaction] of households]"
 
 PLOT
-605
-530
-1725
-680
+600
+579
+1720
+729
 Recycle ratio
 NIL
 NIL
@@ -563,10 +563,10 @@ mean [bin-satisfaction] of households
 11
 
 MONITOR
-1819
-432
-1935
-477
+1626
+189
+1742
+234
 avg education level
 mean [education-level] of households
 1
@@ -574,57 +574,68 @@ mean [education-level] of households
 11
 
 MONITOR
-1678
-473
-1781
-518
-avg household r
+823
+15
+1042
+61
+avg household wasteprodcution ratio
 mean [r] of households
 1
 1
 11
 
 MONITOR
-1822
-516
-1910
-561
-NIL
-recycled-pmd
-0
-1
-11
-
-MONITOR
-1918
-516
-2027
-561
-NIL
-general-collected
-0
-1
-11
-
-MONITOR
-1752
-593
-1895
-638
-NIL
-pmd-missing
-4
-1
-11
-
-MONITOR
-1752
-642
-1960
-687
+1728
+585
+1936
+630
 separated percentage by households
 mean [percentage-separate] of households
 3
+1
+11
+
+MONITOR
+676
+15
+741
+61
+%-family
+%-family
+0
+1
+11
+
+MONITOR
+676
+69
+744
+115
+NIL
+%-couple
+0
+1
+11
+
+MONITOR
+749
+15
+817
+61
+NIL
+%-retiree
+0
+1
+11
+
+MONITOR
+752
+69
+840
+115
+NIL
+%-single
+0
 1
 11
 
