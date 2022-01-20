@@ -1,5 +1,5 @@
 globals [percentage-separate pmd-missing %-organic %-general %-pmd pmd-bin-size pmd-bin-level general-bin-size general-bin-level recycled-general recycled-organic
-  recycled-pmd general-collected pmd-collected recycle-ratio recycle-perception-neigh %-family %-single %-retiree %-couple]
+  recycled-pmd general-collected pmd-collected recycle-ratio recycle-perception-neigh %-family %-single %-retiree %-couple average-r]
 breed [households household]
 breed [bins bin]
 breed [wastecomps wastecomp ]
@@ -35,7 +35,7 @@ to set-up
   set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
   set pmd-trashcan-size 10        ; assume that trashcans do not exceed this value (kg)
   set general-trashcan-size 30     ; assume that trashcans do not exceed this value (kg)
-  set bin-satisfaction 0.9        ; starting value, arbitrary
+  set bin-satisfaction 0.8        ; starting value, arbitrary
     if who <= 13
     [setxy (-1500 + who * 3) -750 ]
     if who <= 50 and who > 13
@@ -46,22 +46,19 @@ to set-up
       id = 0 [   ; family
         set r 2
         set color green
-        set %-family ((count ( households with [id = 0 ]) / number-of-households)) * 100
       ]
       id = 1 [   ; couple
         set r 1.7
         set color brown
-        set %-couple ((count ( households with [id = 1 ]) / number-of-households)) * 100
       ]
       id = 2 [  ; retiree
         set r 1.5
         set color pink
-        set %-retiree ((count ( households with [id = 2 ]) / number-of-households)) * 100
       ]
       id = 3 [  ; single
         set r 1
         set color white
-        set %-single ((count ( households with [id = 3 ]) / number-of-households)) * 100
+
       ])
     ( ifelse
       education-level = 0 [   ; grammar
@@ -80,6 +77,11 @@ to set-up
         set recycle-perception 0.8
       ]
       )
+    set %-family ((count ( households with [id = 0 ]) / number-of-households)) * 100
+    set %-single ((count ( households with [id = 3 ]) / number-of-households)) * 100
+    set %-retiree ((count ( households with [id = 2 ]) / number-of-households)) * 100
+    set %-couple ((count ( households with [id = 1 ]) / number-of-households)) * 100
+    set average-r  mean [r] of households
   ]
   reset-ticks
 end
@@ -97,7 +99,6 @@ to go
      set countergen countergen + 1
      collect-waste
      recycle-pmd-at-home
-     recycle-organic
      calculate-recycle-ratio]
     ]
     [ask households [
@@ -109,7 +110,6 @@ to go
       set countergen countergen + 1
       collect-waste
       recycle-general-pmd
-      recycle-organic
       calculate-recycle-ratio]
     ]
   tick
@@ -147,7 +147,8 @@ end
 
 to dump-general-waste    ; same in both scenarios
   ifelse [general-bin-level] of bin 1 >= [general-bin-size] of bin 1
-     [ set happy false
+     [  set general-bin-level general-bin-level + general-trashcan-level
+        set happy false
        ;print "no general dump"
        change-satisfactionlevel
        set general-trashcan-level 0]   ; assume that people will still dump their waste but just besides the bin
@@ -160,7 +161,8 @@ end
 
 to dump-pmd-waste   ; not applicable in the no separation at home scenario
   ifelse [pmd-bin-level] of bin 0  >= [pmd-bin-size] of bin 0
-      [set happy false
+      [set pmd-bin-level pmd-bin-level + pmd-trashcan-level
+        set happy false
        ;print "no pmd dump"
        change-satisfactionlevel
        set pmd-trashcan-level 0]  ; assume that people will still dump their waste but just besides the bin
@@ -226,12 +228,6 @@ to recycle-general-pmd   ; only applicable when there is no separation at home
    ifelse technology = "Basic"
     [ set recycled-pmd general-collected * %-pmd * 0.6] ; depends on the quality of the technology
     [ set recycled-pmd general-collected * %-pmd * 0.8] ; idem
-end
-
-to recycle-organic
-  ifelse technology = "Basic"
-    [ set recycled-organic general-collected * %-organic * 0.6] ; depends on the quality of the technology
-    [ set recycled-organic general-collected * %-organic * 0.8] ;idem
 end
 
 to calculate-recycle-ratio
@@ -397,7 +393,7 @@ number-of-households
 number-of-households
 0
 26
-25.0
+26.0
 1
 1
 NIL
@@ -411,7 +407,7 @@ CHOOSER
 Technology
 Technology
 "Advanced" "Basic"
-1
+0
 
 PLOT
 1203
@@ -489,7 +485,7 @@ pmd-regionbin-size
 pmd-regionbin-size
 50
 400
-400.0
+200.0
 50
 1
 NIL
@@ -629,10 +625,10 @@ NIL
 11
 
 MONITOR
-823
-15
-983
-61
+846
+22
+994
+68
 avg household waste ratio
 mean [r] of households
 1
@@ -1023,10 +1019,11 @@ NetLogo 6.2.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="2" runMetricsEveryStep="true">
+  <experiment name="experiment" repetitions="3" runMetricsEveryStep="true">
     <setup>set-up</setup>
     <go>go</go>
     <metric>recycle-ratio</metric>
+    <metric>average-r</metric>
     <enumeratedValueSet variable="Technology">
       <value value="&quot;Basic&quot;"/>
       <value value="&quot;Advanced&quot;"/>
@@ -1035,13 +1032,17 @@ NetLogo 6.2.1
       <value value="true"/>
       <value value="false"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="nmbr-weeks-pickup-pmd" first="1" step="1" last="3"/>
-    <steppedValueSet variable="general-regionbin-size" first="200" step="50" last="400"/>
     <enumeratedValueSet variable="number-of-households">
       <value value="26"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="nmbr-weeks-pickup-pmd">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="general-regionbin-size" first="200" step="50" last="400"/>
     <steppedValueSet variable="nmbr-weeks-pickup-gen" first="1" step="1" last="3"/>
-    <steppedValueSet variable="pmd-regionbin-size" first="100" step="50" last="300"/>
+    <enumeratedValueSet variable="pmd-regionbin-size">
+      <value value="200"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
