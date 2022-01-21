@@ -407,7 +407,7 @@ CHOOSER
 Technology
 Technology
 "Advanced" "Basic"
-0
+1
 
 PLOT
 1203
@@ -1034,7 +1034,7 @@ NetLogo 6.2.1
     <enumeratedValueSet variable="nmbr-weeks-pickup-pmd">
       <value value="2"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="general-regionbin-size" first="100" step="50" last="800"/>
+    <steppedValueSet variable="general-regionbin-size" first="100" step="100" last="800"/>
     <enumeratedValueSet variable="number-of-households">
       <value value="26"/>
     </enumeratedValueSet>
@@ -1058,7 +1058,7 @@ NetLogo 6.2.1
     <enumeratedValueSet variable="nmbr-weeks-pickup-pmd">
       <value value="2"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="general-regionbin-size" first="100" step="50" last="800"/>
+    <steppedValueSet variable="general-regionbin-size" first="100" step="100" last="800"/>
     <enumeratedValueSet variable="number-of-households">
       <value value="26"/>
     </enumeratedValueSet>
@@ -1082,7 +1082,7 @@ NetLogo 6.2.1
     <enumeratedValueSet variable="nmbr-weeks-pickup-pmd">
       <value value="2"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="general-regionbin-size" first="100" step="50" last="800"/>
+    <steppedValueSet variable="general-regionbin-size" first="100" step="100" last="800"/>
     <enumeratedValueSet variable="number-of-households">
       <value value="26"/>
     </enumeratedValueSet>
