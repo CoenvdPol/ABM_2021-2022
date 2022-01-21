@@ -380,7 +380,7 @@ SWITCH
 138
 Separation-at-home
 Separation-at-home
-0
+1
 1
 -1000
 
@@ -407,7 +407,7 @@ CHOOSER
 Technology
 Technology
 "Advanced" "Basic"
-0
+1
 
 PLOT
 1203
@@ -1023,7 +1023,7 @@ NetLogo 6.2.1
     <setup>set-up</setup>
     <go>go</go>
     <metric>mean [bin-satisfaction] of households</metric>
-    <metric>mean [recycle-ratio]</metric>
+    <metric>recycle-ratio</metric>
     <metric>average-r</metric>
     <enumeratedValueSet variable="Technology">
       <value value="&quot;Basic&quot;"/>
@@ -1034,7 +1034,7 @@ NetLogo 6.2.1
     <enumeratedValueSet variable="nmbr-weeks-pickup-pmd">
       <value value="2"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="general-regionbin-size" first="100" step="50" last="800"/>
+    <steppedValueSet variable="general-regionbin-size" first="100" step="100" last="800"/>
     <enumeratedValueSet variable="number-of-households">
       <value value="26"/>
     </enumeratedValueSet>
@@ -1058,7 +1058,31 @@ NetLogo 6.2.1
     <enumeratedValueSet variable="nmbr-weeks-pickup-pmd">
       <value value="2"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="general-regionbin-size" first="100" step="50" last="800"/>
+    <steppedValueSet variable="general-regionbin-size" first="100" step="100" last="800"/>
+    <enumeratedValueSet variable="number-of-households">
+      <value value="26"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="nmbr-weeks-pickup-gen" first="1" step="1" last="3"/>
+    <enumeratedValueSet variable="pmd-regionbin-size">
+      <value value="200"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="ExperimentADV" repetitions="8" runMetricsEveryStep="true">
+    <setup>set-up</setup>
+    <go>go</go>
+    <metric>mean [bin-satisfaction] of households</metric>
+    <metric>mean [recycle-ratio]</metric>
+    <metric>average-r</metric>
+    <enumeratedValueSet variable="Technology">
+      <value value="&quot;Advanced&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Separation-at-home">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="nmbr-weeks-pickup-pmd">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="general-regionbin-size" first="100" step="100" last="800"/>
     <enumeratedValueSet variable="number-of-households">
       <value value="26"/>
     </enumeratedValueSet>
