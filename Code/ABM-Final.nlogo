@@ -407,7 +407,7 @@ CHOOSER
 Technology
 Technology
 "Advanced" "Basic"
-1
+0
 
 PLOT
 1203
@@ -1020,7 +1020,7 @@ NetLogo 6.2.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="ExperimentBASIC" repetitions="8" runMetricsEveryStep="true">
+  <experiment name="Experiment" repetitions="8" runMetricsEveryStep="true">
     <setup>set-up</setup>
     <go>go</go>
     <metric>mean [bin-satisfaction] of households</metric>
@@ -1028,6 +1028,7 @@ NetLogo 6.2.1
     <metric>average-r</metric>
     <enumeratedValueSet variable="Technology">
       <value value="&quot;Basic&quot;"/>
+      <value value="&quot;Advanced&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Separation-at-home">
       <value value="true"/>
@@ -1052,33 +1053,10 @@ NetLogo 6.2.1
     <metric>average-r</metric>
     <enumeratedValueSet variable="Technology">
       <value value="&quot;Basic&quot;"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Separation-at-home">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="nmbr-weeks-pickup-pmd">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <steppedValueSet variable="general-regionbin-size" first="100" step="100" last="800"/>
-    <enumeratedValueSet variable="number-of-households">
-      <value value="26"/>
-    </enumeratedValueSet>
-    <steppedValueSet variable="nmbr-weeks-pickup-gen" first="1" step="1" last="3"/>
-    <enumeratedValueSet variable="pmd-regionbin-size">
-      <value value="200"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="ExperimentADV" repetitions="8" runMetricsEveryStep="true">
-    <setup>set-up</setup>
-    <go>go</go>
-    <metric>mean [bin-satisfaction] of households</metric>
-    <metric>mean [recycle-ratio]</metric>
-    <metric>average-r</metric>
-    <enumeratedValueSet variable="Technology">
       <value value="&quot;Advanced&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Separation-at-home">
-      <value value="true"/>
+      <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="nmbr-weeks-pickup-pmd">
       <value value="2"/>
