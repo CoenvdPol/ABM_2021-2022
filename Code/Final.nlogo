@@ -10,9 +10,9 @@ wastecomps-own [ collected-pmd collected-gen counterpmd countergen];
 
 to set-up
   clear-all
-  set %-organic 0.37 ; Retreived from Milieucentraal
-  set %-general 0.53
-  set %-pmd     0.10
+  set %-organic 0.37                                 ;Retreived from Milieucentraal
+  set %-general 0.53                                 ;Retreived from Milieucentraal
+  set %-pmd     0.10                                 ;Retreived from Milieucentraal
     ask patches [
     set pcolor black
   ]
@@ -20,22 +20,22 @@ to set-up
   [ set shape "garbage can"
     set color red
     set size 2
-    set xcor -300 + who * 600          ; location of bins
-    set general-bin-size general-regionbin-size
-    set pmd-bin-size pmd-regionbin-size
+    set xcor -300 + who * 600                        ;Location of bins
+    set general-bin-size general-regionbin-size      ;One of the decision variables of the model
+    set pmd-bin-size pmd-regionbin-size              ;One of the decision variables of the model
   ]
   create-wastecomps 1[
-    set color green set shape "factory" set size 3  ;; easier to see
+    set color green set shape "factory" set size 3
     setxy 1500 1500
 
   ]
 
   create-households number-of-households [
-  set id random 4                ; how we make sure we have 4 different type of agents in agentset, type of household
-  set education-level random 5     ; assumption: educational level is per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
-  set pmd-trashcan-size 10        ; assume that trashcans do not exceed this value (kg)
-  set general-trashcan-size 30     ; assume that trashcans do not exceed this value (kg)
-  set bin-satisfaction 0.8        ; starting value, arbitrary
+  set id random 4                                    ;For having four different types of households
+  set education-level random 5                       ;Assign educational level per household, 0 = basisonderwijs (grammar) ; 1= voorgezet onderwijs (secondary); 2 = MBO ; 3 = HBO ; 4 = University
+  set pmd-trashcan-size 10                           ;Assume that pmd trashcan do not exceed 10 kg
+  set general-trashcan-size 30                       ;Assume that general trashcans do not exceed 30 kg
+  set bin-satisfaction 0.8                           ;Starting value for bin satisfaction, arbitrary
     if who <= 13
     [setxy (-1500 + who * 3) -750 ]
     if who <= 50 and who > 13
@@ -61,19 +61,19 @@ to set-up
 
       ])
     ( ifelse
-      education-level = 0 [   ; grammar
+      education-level = 0 [                           ;Grammar
         set recycle-perception 0.4
       ]
-      education-level = 1 [   ; secondary schooling
+      education-level = 1 [                           ;Secondary schooling
         set recycle-perception 0.5
       ]
-      education-level = 2 [  ;  MBO
+      education-level = 2 [                           ;MBO
         set recycle-perception 0.6
       ]
-      education-level = 3 [  ;HBO
+      education-level = 3 [                           ;HBO
         set recycle-perception 0.7 ;
       ]
-      education-level = 4 [  ;University
+      education-level = 4 [                           ;University
         set recycle-perception 0.8
       ]
       )
@@ -87,7 +87,7 @@ to set-up
 end
 
 to go
-  if ticks >= 1040 [ stop ]; 20 years
+  if ticks >= 1040 [ stop ]                           ;20 years
     ifelse separation-at-home = true
      [ask households [
       produce-waste
@@ -101,10 +101,10 @@ to go
      recycle-pmd-at-home
      calculate-recycle-ratio]
     ]
-    [ask households [
+   [ask households [
       produce-waste
       manage-all
-      change-perceptionlevel ] ; Could leave this of since it wont affect the model
+      change-perceptionlevel ]
      ask wastecomps [
       set counterpmd counterpmd + 1
       set countergen countergen + 1
@@ -116,8 +116,8 @@ to go
 end
 
 
-to produce-waste  ;create a function with r that represents different agentsets behaviour
-    set waste r *  ((376.4 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52   ; prodcuction of waste per person per week in kg
+to produce-waste                                   ;Create a function with r that represents different agentsets behaviour
+    set waste r *  ((376.4 - 0.2 * ticks) - exp(-0.01 * ticks )* sin (0.3 * ticks)) / 52   ;Prodcuction of waste per person per week in kg
 end
 
 to manage-waste
@@ -137,7 +137,7 @@ to manage-waste
         set pmd-trashcan-level pmd-trashcan-level + separated ]
 end
 
-to manage-all  ; only applicable in the no separation at home scenario
+to manage-all                                      ;Only applicable in the no separation at home scenario
   set general-trashcan-level general-trashcan-level + waste
   ifelse general-trashcan-level >= general-trashcan-size
       [ dump-general-waste ]
@@ -145,13 +145,13 @@ to manage-all  ; only applicable in the no separation at home scenario
       set general-trashcan-level general-trashcan-level + waste ]
 end
 
-to dump-general-waste    ; same in both scenarios
+to dump-general-waste                             ;Same in both scenarios
   ifelse [general-bin-level] of bin 1 >= [general-bin-size] of bin 1
      [  set general-bin-level general-bin-level + general-trashcan-level
         set happy false
        ;print "no general dump"
        change-satisfactionlevel
-       set general-trashcan-level 0]   ; assume that people will still dump their waste but just besides the bin
+       set general-trashcan-level 0]              ;Assume that people will still dump their waste but just besides the bin
      [set general-bin-level general-bin-level + general-trashcan-level
       set happy true
       ;print "hallo"
@@ -159,13 +159,13 @@ to dump-general-waste    ; same in both scenarios
       set general-trashcan-level 0 ]
 end
 
-to dump-pmd-waste   ; not applicable in the no separation at home scenario
+to dump-pmd-waste                                 ;Not applicable in the no separation at home scenario
   ifelse [pmd-bin-level] of bin 0  >= [pmd-bin-size] of bin 0
       [set pmd-bin-level pmd-bin-level + pmd-trashcan-level
         set happy false
        ;print "no pmd dump"
        change-satisfactionlevel
-       set pmd-trashcan-level 0]  ; assume that people will still dump their waste but just besides the bin
+       set pmd-trashcan-level 0]                  ;Assume that people will still dump their waste but just besides the bin
       [set pmd-bin-level pmd-bin-level + pmd-trashcan-level
       set happy true
       change-satisfactionlevel
@@ -174,24 +174,24 @@ end
 
 to change-satisfactionlevel
   ifelse happy = true
-    [ifelse bin-satisfaction >= 0.95238      ; This function makes sure that bin-satisfaction cannot be higher than 1
+    [ifelse bin-satisfaction >= 0.95238           ;This function makes sure that bin-satisfaction cannot be higher than 1
       [set bin-satisfaction 1]
       [ifelse bin-satisfaction <= 0.05
         [set bin-satisfaction bin-satisfaction + 0.1]
-        [set bin-satisfaction bin-satisfaction * 1.05]] ]; satisfied = satisfaction level increases %5.
-    [set bin-satisfaction bin-satisfaction * 0.95]  ; dissatisfied = satisfaction level decreases %5. It can never reach 0
+        [set bin-satisfaction bin-satisfaction * 1.05]] ]                           ;Satisfied = satisfaction level increases %5.
+    [set bin-satisfaction bin-satisfaction * 0.95]                                  ;Dissatisfied = satisfaction level decreases %5. It can never reach 0
 end
 
 to change-perceptionlevel
   set recycle-perception-neigh mean [recycle-perception] of other households in-radius 5
-  ifelse recycle-perception <= recycle-perception-neigh and recycle-perception != 0  ; if it is higher
+  ifelse recycle-perception <= recycle-perception-neigh and recycle-perception != 0
     [ifelse recycle-perception >= (recycle-perception-neigh / (2 * recycle-perception-neigh - recycle-perception ))  ; This function makes sure that recycle-perception cannot be higher than 1
       [set recycle-perception recycle-perception * bin-satisfaction
       ;print "lower perception, close to 1"
       ]
       [set recycle-perception (((((recycle-perception-neigh) - recycle-perception)/(recycle-perception-neigh)) + 1 ) * recycle-perception) * bin-satisfaction
-      ;print "lower perception, not close to 1"
-  ]] ; multiply its own recycle perception by the % difference with the neighbors
+      ;print "lower perception, not close to 1"                                     ;Multiply its own recycle perception by the % difference with the neighbors
+  ]]
    [ifelse recycle-perception <= 0.01
      [set recycle-perception recycle-perception + 0.05]
      [ifelse recycle-perception >= 0.99
@@ -205,7 +205,7 @@ to change-perceptionlevel
 end
 
 
-to collect-waste ;;Either collection at home or central point collection --> This can be analysed
+to collect-waste                                                                    ;Either collection at home or central point collection
   if  counterpmd >= nmbr-weeks-pickup-pmd
       [ set pmd-collected pmd-collected + pmd-bin-level
         set pmd-bin-level 0
@@ -218,16 +218,16 @@ to collect-waste ;;Either collection at home or central point collection --> Thi
         set countergen 0 ]
 end
 
-to recycle-pmd-at-home  ; only applicable when pmd is separated at home
+to recycle-pmd-at-home                                                              ;Only applicable when pmd is separated at home
    ifelse technology = "Basic"
-    [ set recycled-pmd  pmd-collected + (general-collected * pmd-missing * 0.6)] ; depends on the quality of the technology
-    [ set recycled-pmd  pmd-collected + (general-collected * pmd-missing * 0.8)] ; idem
+    [ set recycled-pmd  pmd-collected + (general-collected * pmd-missing * 0.6)]    ;Depends on the quality of the technology
+    [ set recycled-pmd  pmd-collected + (general-collected * pmd-missing * 0.8)]
 end
 
-to recycle-general-pmd   ; only applicable when there is no separation at home
+to recycle-general-pmd                                                              ;Only applicable when there is no separation at home
    ifelse technology = "Basic"
-    [ set recycled-pmd general-collected * %-pmd * 0.6] ; depends on the quality of the technology
-    [ set recycled-pmd general-collected * %-pmd * 0.8] ; idem
+    [ set recycled-pmd general-collected * %-pmd * 0.6]
+    [ set recycled-pmd general-collected * %-pmd * 0.8]
 end
 
 to calculate-recycle-ratio
@@ -638,11 +638,12 @@ mean [r] of households
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+The model aims to understand the how waste bin size capacities and frequecy of waste collection affects recycling behaviour of households for two different policy (Separation at home or general waste collection)
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+Households produce waste based on the number of people who live in the house, and separate their waste based on their recycling perception. They regularly checks the level of trashcans which are in their house and dump their waste. If they encounter full bin, they became unhappy, throw their waste and change their satisfaction, which is incorpated with perception level.
+Recycling company collects waste from bins and recycle them under two different technology (Basic vs. Advanced)
 
 ## HOW TO USE IT
 
@@ -658,7 +659,7 @@ mean [r] of households
 
 ## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+For the next step, how different educational level affects the recycling perception can also be incorparated with the model.
 
 ## NETLOGO FEATURES
 
